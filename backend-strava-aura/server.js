@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const session = require('express-session');
 
 dotenv.config();
 
@@ -10,6 +11,14 @@ const port = 3000;
 
 app.use(cors()); 
 app.use(express.json());
+
+// Set up Session
+app.use(session({
+    secret: '1Um8mYy1V7jkfnQI0ycdLu35dTJb6Mja',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure : false } // TODO: Set to true in production
+}));
 
 // Root Route
 app.get('/', (req, res) => {
@@ -44,15 +53,50 @@ app.get('/api/auth/callback', async (req, res) => {
         });
 
         const { access_token, refresh_token, expires_at } = response.data;
-        // res.json({ access_token, refresh_token, expires_at });
-        console.log("Got Access Token");
-        // Redirect back to the frontend, passing the token as a query parameter
-        const frontendUrl = `${process.env.FRONTEND_URL}/?access_token=${access_token}&refresh_token=${refresh_token}&expires_at=${expires_at}`;
+
+        // Store Tokens in Session
+        req.session.access_token = access_token;
+        req.session.refresh_token = refresh_token;
+        req.session.expires_at = expires_at;
+
+        // Redirect to frontend without tokens in URL
+        const frontendUrl = `${process.env.FRONTEND_URL}/aura`;
         res.redirect(frontendUrl);
+
+        // Redirect back to the frontend, passing the token as a query parameter
+        // const frontendUrl = `${process.env.FRONTEND_URL}/?access_token=${access_token}&refresh_token=${refresh_token}&expires_at=${expires_at}`;
+        // res.redirect(frontendUrl);
     } catch (error) {
         console.error(error);
         res.status(500).send('Error exchanging code for token');
     }
+});
+
+app.get('/api/profile', async (req, res) => {
+    const {access_token, refresh_token, expires_at } = req.session;
+
+    // Check Expiration
+    if (Date.now() >= expires_at * 1000){
+        console.log("Access Token expired, refresing...")
+
+        // this.refresh
+    }
+
+    // Make call to Strava API
+    try{
+        const profileResponse = await axios.get('https://www.strava.com/api/v3/athlete', {
+            headers: {
+                Authorization : `Bearer ${req.session.access_token}`
+            }
+        });
+
+        res.json(profileResponse.data);
+    }
+    catch (err){
+        console.error('Errot fetching athlete profile', err);
+        res.status(500).send('Error fetching athlete profile');
+    }
+
 });
 
 app.listen(port, () => {

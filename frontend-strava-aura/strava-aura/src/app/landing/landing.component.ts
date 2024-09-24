@@ -17,19 +17,7 @@ export class LandingComponent {
   ) { }
 
   ngOnInit(): void {
-    
-    // Check for Authorization code in the URL
-    this.route.queryParams.subscribe(params => {
-      const accessToken = params['access_token'];
 
-      if (accessToken){
-        console.log("Got access Token");
-        this.hasToken = true;
-        localStorage.setItem('access_token', accessToken);
-        this.router.navigate(['/aura']);
-      }
-
-    });
   }
 
   // Trigger Strava OAuth2 authentication

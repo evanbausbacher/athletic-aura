@@ -3,11 +3,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { LandingComponent } from './landing/landing.component';
-import { authGuard } from './auth.guard';
 
 const routes: Routes = [
   { path: '', component: LandingComponent},
-  { path: 'aura', component: HomeComponent, canActivate: [authGuard] }
+  { path: 'aura', component: HomeComponent }
 ];
 
 @NgModule({
