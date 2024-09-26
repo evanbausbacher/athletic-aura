@@ -1,2 +1,4 @@
-<h2>Dashboard</h2>
-<p>Welcome, Athlete!</p>
+<div *ngIf="athleteProfile">
+    <img [src]="athleteProfile.profile_medium"><img>
+    <h4>{{ getFullName() }}</h4>
+</div>

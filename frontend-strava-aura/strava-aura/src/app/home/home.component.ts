@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProfileService } from '../services/profile.service';
+import { IAthleteProfile } from '../models/athlete-profile.model';
 
 @Component({
   selector: 'app-home',
@@ -8,7 +9,7 @@ import { ProfileService } from '../services/profile.service';
 })
 export class HomeComponent implements OnInit{
 
-  athleteProfile : any;
+  athleteProfile : IAthleteProfile | null = null;
 
   constructor(
     private profileService : ProfileService
@@ -21,4 +22,13 @@ export class HomeComponent implements OnInit{
     });
   }
 
+
+  getFullName() : string{
+    if (this.athleteProfile){
+      return this.athleteProfile.firstname + " " + this.athleteProfile.lastname;
+    }
+    else{
+      return ""
+    }
+  }
 }

@@ -3,6 +3,7 @@ const axios = require('axios');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const session = require('express-session');
+const AthleteProfile = require('./models/AthleteProfile');
 
 dotenv.config();
 
@@ -90,10 +91,12 @@ app.get('/api/profile', async (req, res) => {
             }
         });
 
-        res.json(profileResponse.data);
+        const profile = new AthleteProfile(profileResponse.data);
+
+        res.json(profile);
     }
     catch (err){
-        console.error('Errot fetching athlete profile', err);
+        console.error('Error fetching athlete profile', err);
         res.status(500).send('Error fetching athlete profile');
     }
 
