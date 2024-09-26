@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const AthleteProfile = require('./models/AthleteProfile');
+const AthleteStats = require('./models/AthleteStats');
 
 dotenv.config();
 
@@ -100,6 +101,36 @@ app.get('/api/profile', async (req, res) => {
         res.status(500).send('Error fetching athlete profile');
     }
 
+});
+
+
+app.get('/api/stats/:profileId', async (req ,res) => {
+    const { profileId } = req.params;
+    const {access_token, refresh_token, expires_at } = req.session;
+
+    // Check Expiration
+    if (Date.now() >= expires_at * 1000){
+        console.log("Access Token expired, refresing...")
+
+        // this.refresh
+    }
+
+    // Make call to Strava API
+    try{
+        const statsResponse = await axios.get(`https://www.strava.com/api/v3/athletes/${profileId}/stats`, {
+            headers: {
+                Authorization : `Bearer ${req.session.access_token}`
+            }
+        });
+
+        const athleteStats = new AthleteStats(statsResponse.data);
+
+        res.json(athleteStats);
+    }
+    catch (err){
+        console.error('Error fetching athlete stats', err);
+        res.status(500).send('Error fetching athlete stats');
+    }
 });
 
 app.listen(port, () => {
