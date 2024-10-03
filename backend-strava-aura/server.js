@@ -92,6 +92,8 @@ app.get('/api/profile', async (req, res) => {
             }
         });
 
+        // console.log(profileResponse.data);
+
         const profile = new AthleteProfile(profileResponse.data);
 
         res.json(profile);

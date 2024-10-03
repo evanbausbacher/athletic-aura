@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ProfileService } from '../services/profile.service';
 import { IAthleteProfile } from '../models/athlete-profile.model';
 import { IAthleteStats } from '../models/athlete-stats.model';
+import { IScore } from '../models/score.model';
+import { CalculateAuraService } from '../services/calculate-aura.service';
 
 @Component({
   selector: 'app-home',
@@ -14,7 +16,8 @@ export class HomeComponent implements OnInit{
   athleteStats : IAthleteStats | null = null;
 
   constructor(
-    private profileService : ProfileService
+    private profileService : ProfileService,
+    private scoreService : CalculateAuraService
   ){}
 
   ngOnInit(): void {
@@ -24,8 +27,12 @@ export class HomeComponent implements OnInit{
 
       this.profileService.getStats(this.athleteProfile.id).subscribe(stats => {
         this.athleteStats = stats;
+
+        let score : IScore = this.scoreService.generateScore(this.athleteProfile!, this.athleteStats);
+
         console.log(stats);
-      })
+        console.log(score);
+      });
     });
   }
 

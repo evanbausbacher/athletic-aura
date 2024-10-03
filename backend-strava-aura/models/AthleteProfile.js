@@ -4,8 +4,7 @@ class AthleteProfile{
         this.resource_state = data.resource_state;
         this.firstname = data.firstname;
         this.lastname = data.lastname;
-        this.profile_medium = data.profile_medium;
-        this.profile = data.profile;
+        this.bio = data.bio;
         this.city = data.city;
         this.state = data.state;
         this.country = data.country;
@@ -14,6 +13,10 @@ class AthleteProfile{
         this.summit = data.summit;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
+        this.badge_type_id = data.badge_type_id;
+        this.weight = data.weight;
+        this.profile_medium = data.profile_medium;
+        this.profile = data.profile;
     }
 }
 
