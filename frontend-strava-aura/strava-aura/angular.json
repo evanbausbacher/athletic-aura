@@ -32,6 +32,8 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
+              "src/logo.png",
+              "src/og-image-strava.png",
               "src/assets"
             ],
             "styles": [
@@ -94,6 +96,8 @@
             "tsConfig": "tsconfig.spec.json",
             "assets": [
               "src/favicon.ico",
+              "src/logo.png",
+              "src/og-image-strava.png",
               "src/assets"
             ],
             "styles": [
