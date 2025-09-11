@@ -3,7 +3,6 @@ import { IAthleteProfile } from '../models/athlete-profile.model';
 import { IAthleteStats } from '../models/athlete-stats.model';
 import { IScore } from '../models/score.model';
 import { IScoreCategory } from '../models/score-category.model';
-import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +13,6 @@ export class CalculateAuraService {
   // 2. Cycling Score : Recent activity, distance, elevation, total hours
   // 3. Running Score : Recent runs, distance, elevation, total hours  
   // 4. Epic Score : Biggest single ride distance and biggest climb
-  constructor() {}
 
   profileScore: IScoreCategory | undefined;
   rideScore: IScoreCategory | undefined;
@@ -101,8 +99,8 @@ export class CalculateAuraService {
 
   private calculateCompletenessScore(profile: IAthleteProfile): IScoreCategory {
     let score = 0;
-    let perks: string[] = [];
-    let index: number = 0;
+    const perks: string[] = [];
+    let index = 0;
 
     if (profile.summit) {
       score += 10;
@@ -128,7 +126,7 @@ export class CalculateAuraService {
       index++;
     }
 
-    let coolStates: string[] = ['Texas', 'Florida', 'Colorado', 'Wisconsin', 'Utah', 'California'];
+    const coolStates: string[] = ['Texas', 'Florida', 'Colorado', 'Wisconsin', 'Utah', 'California'];
     if (coolStates.includes(profile.state)) {
       score += 10;
       perks[index] = 'baller state';
@@ -164,7 +162,7 @@ export class CalculateAuraService {
     };
   }
 
-  private calculateSocialScore(profile: IAthleteProfile): IScoreCategory {
+  private calculateSocialScore(): IScoreCategory {
     return {
       categoryName: 'Social Score',
       score: 50,
@@ -175,9 +173,9 @@ export class CalculateAuraService {
 
   private calculateRideScore(stats: IAthleteStats): IScoreCategory {
     let score = 0;
-    let perks: string[] = [];
-    let index: number = 0;
-    let rating: string = '';
+    const perks: string[] = [];
+    let index = 0;
+    let rating = '';
 
     if (stats.recent_ride_totals.count >= 20) {
       score += 20;
@@ -187,21 +185,21 @@ export class CalculateAuraService {
       score += 10;
     }
 
-    let ytdDistance = stats.ytd_ride_totals.distance / 1000;
+    const ytdDistance = stats.ytd_ride_totals.distance / 1000;
     if (ytdDistance > 10_000) {
       score += 20;
       perks[index] = 'cycle daddy';
       index++;
     }
 
-    let ytdVert = stats.ytd_ride_totals.elevation_gain;
+    const ytdVert = stats.ytd_ride_totals.elevation_gain;
     if (ytdVert > 100_000) {
       score += 20;
       perks[index] = 'nairoman';
       index++;
     }
 
-    let totalHoursEver = stats.all_ride_totals.elapsed_time / 3600;
+    const totalHoursEver = stats.all_ride_totals.elapsed_time / 3600;
     if (totalHoursEver > 5000) {
       if (totalHoursEver > 10_000) {
         score += 40;
@@ -234,9 +232,9 @@ export class CalculateAuraService {
 
   private calculateRunScore(stats: IAthleteStats): IScoreCategory {
     let score = 0;
-    let perks: string[] = [];
-    let index: number = 0;
-    let rating: string = '';
+    const perks: string[] = [];
+    let index = 0;
+    let rating = '';
 
     if (stats.recent_run_totals.count >= 20) {
       score += 20;
@@ -250,21 +248,21 @@ export class CalculateAuraService {
       score += 10;
     }
 
-    let ytdDistance = stats.ytd_run_totals.distance / 1000;
+    const ytdDistance = stats.ytd_run_totals.distance / 1000;
     if (ytdDistance > 40_000) {
       score += 20;
       perks[index] = 'distance daddy';
       index++;
     }
 
-    let ytdVert = stats.ytd_run_totals.elevation_gain;
+    const ytdVert = stats.ytd_run_totals.elevation_gain;
     if (ytdVert > 50_000) {
       score += 20;
       perks[index] = 'alex honnold';
       index++;
     }
 
-    let totalHoursEver = stats.all_run_totals.elapsed_time / 3600;
+    const totalHoursEver = stats.all_run_totals.elapsed_time / 3600;
     if (totalHoursEver > 1000) {
       if (totalHoursEver > 50_000) {
         score += 40;
@@ -298,12 +296,12 @@ export class CalculateAuraService {
 
   private calculateEpicScore(stats: IAthleteStats): IScoreCategory {
     let score = 0;
-    let perks: string[] = [];
-    let index: number = 0;
-    let rating: string = '';
+    const perks: string[] = [];
+    let index = 0;
+    let rating = '';
 
-    let distance = stats.biggest_ride_distance / 1000;
-    let climb = stats.biggest_climb_elevation_gain;
+    const distance = stats.biggest_ride_distance / 1000;
+    const climb = stats.biggest_climb_elevation_gain;
 
     if (distance > 300) {
       score += 50;

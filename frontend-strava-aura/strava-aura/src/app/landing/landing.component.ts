@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -8,15 +8,11 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './landing.component.css',
 })
 export class LandingComponent {
-  hasToken: boolean = false;
+  hasToken = false;
 
-  constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {}
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   // Trigger Strava OAuth2 authentication
   authenticateWithStrava() {

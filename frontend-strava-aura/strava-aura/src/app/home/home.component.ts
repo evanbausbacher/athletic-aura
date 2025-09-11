@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ProfileService } from '../services/profile.service';
 import { IAthleteProfile } from '../models/athlete-profile.model';
 import { IAthleteStats } from '../models/athlete-stats.model';
@@ -14,13 +14,11 @@ export class HomeComponent implements OnInit {
   athleteProfile: IAthleteProfile | null = null;
   athleteStats: IAthleteStats | null = null;
   auraScore: IScore | null = null;
-  isLoading: boolean = true;
-  errorMessage: string = '';
+  isLoading = true;
+  errorMessage = '';
 
-  constructor(
-    private profileService: ProfileService,
-    private scoreService: CalculateAuraService
-  ) {}
+  private profileService = inject(ProfileService);
+  private scoreService = inject(CalculateAuraService);
 
   ngOnInit(): void {
     this.loadAthleteData();
@@ -88,7 +86,7 @@ export class HomeComponent implements OnInit {
   }
 
   getCategoryIcon(categoryName: string): string {
-    const icons: { [key: string]: string } = {
+    const icons: Record<string, string> = {
       'Profile Completeness': '👤',
       'Cycling Score': '🚴',
       'Running Score': '🏃',

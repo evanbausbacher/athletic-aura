@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -9,7 +9,7 @@ export class AuthService {
   apiUrl = '/api';
   backendUrl = 'http://localhost:3000';
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getHello() {
     return this.http.get(this.apiUrl + '/hello');
@@ -19,7 +19,7 @@ export class AuthService {
     window.location.href = `${this.backendUrl}/auth/strava`;
   }
 
-  getAccessToken(code: string): Observable<any> {
+  getAccessToken(code: string): Observable<unknown> {
     return this.http.get(`${this.apiUrl}/auth/callback?code=${code}`);
   }
 }
