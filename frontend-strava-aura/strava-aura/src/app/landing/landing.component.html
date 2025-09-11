@@ -1,5 +1,164 @@
-<h2>Welcome to Strava Aura</h2>
+<!-- Hero Section -->
+<div class="min-h-screen bg-gradient-to-br from-strava-dark via-strava-gray to-gray-800">
+  <div class="container mx-auto px-4 py-16">
+    
+    <!-- Header -->
+    <header class="text-center mb-16">
+      <h1 class="text-6xl md:text-7xl font-lobster text-white mb-6">
+        Strava Aura
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+        Discover your athletic personality through our comprehensive analysis of your Strava data. 
+        Get scored across 5 categories and unlock your unique <span class="text-strava-orange font-semibold">aura score</span>.
+      </p>
+    </header>
 
-<p>get your strava aura analyzed</p>
+    <!-- Main CTA -->
+    <div class="text-center mb-20">
+      <button 
+        *ngIf="!hasToken" 
+        (click)="authenticateWithStrava()"
+        class="inline-flex items-center px-8 py-4 bg-strava-orange hover:bg-orange-600 text-white font-bold text-lg rounded-lg transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl"
+      >
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.599h4.172L10.463 0l-7 13.828h4.172"/>
+        </svg>
+        Connect with Strava
+      </button>
+    </div>
 
-<button *ngIf="!hasToken" (click)="authenticateWithStrava()">Authenticate with Strava</button>
+    <!-- Feature Preview Cards -->
+    <div class="grid md:grid-cols-5 gap-6 mb-16">
+      <!-- Profile Completeness -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+        <div class="w-12 h-12 bg-strava-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-strava-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-lobster text-lg mb-2">Profile</h3>
+        <p class="text-gray-300 text-sm">Premium status, bio completeness, account age</p>
+      </div>
+
+      <!-- Cycling Score -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+        <div class="w-12 h-12 bg-strava-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-strava-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-lobster text-lg mb-2">Cycling</h3>
+        <p class="text-gray-300 text-sm">Distance, elevation, frequency, total hours</p>
+      </div>
+
+      <!-- Running Score -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+        <div class="w-12 h-12 bg-strava-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-strava-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 17l-4 4-4-4m4-4V3"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-lobster text-lg mb-2">Running</h3>
+        <p class="text-gray-300 text-sm">Pace, distance, consistency, elevation</p>
+      </div>
+
+      <!-- Swimming Score -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+        <div class="w-12 h-12 bg-strava-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-strava-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-lobster text-lg mb-2">Swimming</h3>
+        <p class="text-gray-300 text-sm">Pool distance, open water, frequency</p>
+      </div>
+
+      <!-- Epic Score -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/20 transition-all duration-300">
+        <div class="w-12 h-12 bg-strava-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-strava-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-lobster text-lg mb-2">Epic</h3>
+        <p class="text-gray-300 text-sm">Biggest rides, highest climbs, achievements</p>
+      </div>
+    </div>
+
+    <!-- Sample Score Preview -->
+    <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto">
+      <h2 class="text-3xl font-lobster text-white text-center mb-8">Example Aura Score</h2>
+      <div class="grid md:grid-cols-3 gap-8 items-center">
+        
+        <!-- Overall Score -->
+        <div class="text-center">
+          <div class="text-6xl font-lobster text-strava-orange mb-2">87</div>
+          <div class="text-xl text-white font-semibold mb-1">Overall Score</div>
+          <div class="text-strava-orange font-medium">Epic Cyclist</div>
+        </div>
+
+        <!-- Score Breakdown -->
+        <div class="md:col-span-2 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-white">Profile Completeness</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-32 bg-gray-600 rounded-full h-2">
+                <div class="bg-strava-orange h-2 rounded-full" style="width: 85%"></div>
+              </div>
+              <span class="text-white font-medium w-8">85</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white">Cycling Score</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-32 bg-gray-600 rounded-full h-2">
+                <div class="bg-strava-orange h-2 rounded-full" style="width: 92%"></div>
+              </div>
+              <span class="text-white font-medium w-8">92</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white">Running Score</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-32 bg-gray-600 rounded-full h-2">
+                <div class="bg-warning h-2 rounded-full" style="width: 67%"></div>
+              </div>
+              <span class="text-white font-medium w-8">67</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white">Swimming Score</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-32 bg-gray-600 rounded-full h-2">
+                <div class="bg-error h-2 rounded-full" style="width: 23%"></div>
+              </div>
+              <span class="text-white font-medium w-8">23</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white">Epic Score</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-32 bg-gray-600 rounded-full h-2">
+                <div class="bg-success h-2 rounded-full" style="width: 88%"></div>
+              </div>
+              <span class="text-white font-medium w-8">88</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer CTA -->
+    <div class="text-center mt-16">
+      <p class="text-gray-300 mb-6">Ready to discover your athletic personality?</p>
+      <button 
+        *ngIf="!hasToken" 
+        (click)="authenticateWithStrava()"
+        class="inline-flex items-center px-6 py-3 bg-transparent border-2 border-strava-orange text-strava-orange hover:bg-strava-orange hover:text-white font-semibold rounded-lg transition-all duration-300"
+      >
+        Get Your Aura Score
+      </button>
+    </div>
+
+  </div>
+</div>
