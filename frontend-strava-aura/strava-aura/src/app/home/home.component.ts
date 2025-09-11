@@ -13,6 +13,7 @@ import { CalculateAuraService } from '../services/calculate-aura.service';
 export class HomeComponent implements OnInit {
   athleteProfile: IAthleteProfile | null = null;
   athleteStats: IAthleteStats | null = null;
+  auraScore: IScore | null = null;
   isLoading: boolean = true;
   errorMessage: string = '';
 
@@ -37,13 +38,13 @@ export class HomeComponent implements OnInit {
         this.profileService.getStats(this.athleteProfile.id).subscribe({
           next: (stats) => {
             this.athleteStats = stats;
-            const score: IScore = this.scoreService.generateScore(
+            this.auraScore = this.scoreService.generateScore(
               this.athleteProfile!,
               this.athleteStats
             );
 
             console.log(stats);
-            console.log(score);
+            console.log(this.auraScore);
             this.isLoading = false;
           },
           error: (error) => {
@@ -71,5 +72,36 @@ export class HomeComponent implements OnInit {
     } else {
       return '';
     }
+  }
+
+  getAccountAge(): string {
+    if (this.athleteProfile?.created_at) {
+      const createdDate = new Date(this.athleteProfile.created_at);
+      return createdDate.getFullYear().toString();
+    }
+    return 'Unknown';
+  }
+
+  getTopCategoryScore(): number {
+    if (!this.auraScore?.scores) return 0;
+    return Math.max(...this.auraScore.scores.map(s => s.score));
+  }
+
+  getCategoryIcon(categoryName: string): string {
+    const icons: { [key: string]: string } = {
+      'Profile Completeness': '👤',
+      'Cycling Score': '🚴',
+      'Running Score': '🏃',
+      'Swimming Score': '🏊',
+      'Epic Score': '⛰️'
+    };
+    return icons[categoryName] || '🏅';
+  }
+
+  getScoreColor(score: number): string {
+    if (score >= 80) return 'bg-success';
+    if (score >= 60) return 'bg-strava-orange';
+    if (score >= 40) return 'bg-warning';
+    return 'bg-error';
   }
 }

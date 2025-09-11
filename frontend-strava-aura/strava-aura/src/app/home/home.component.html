@@ -1,13 +1,170 @@
-<div *ngIf="isLoading" class="loading">
-  <p>Loading your Strava Aura...</p>
+<!-- Loading State -->
+<div *ngIf="isLoading" class="min-h-screen bg-gradient-to-br from-strava-dark via-strava-gray to-gray-800 flex items-center justify-center">
+  <div class="text-center">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-strava-orange border-solid mx-auto mb-4"></div>
+    <p class="text-white text-xl font-lobster">Loading your Strava Aura...</p>
+  </div>
 </div>
 
-<div *ngIf="errorMessage" class="error">
-  <p>{{ errorMessage }}</p>
-  <button (click)="retryLoadData()">Retry</button>
+<!-- Error State -->
+<div *ngIf="errorMessage" class="min-h-screen bg-gradient-to-br from-strava-dark via-strava-gray to-gray-800 flex items-center justify-center">
+  <div class="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md">
+    <div class="text-error text-6xl mb-4">⚠️</div>
+    <p class="text-white text-lg mb-6">{{ errorMessage }}</p>
+    <button 
+      (click)="retryLoadData()"
+      class="px-6 py-3 bg-strava-orange hover:bg-orange-600 text-white font-semibold rounded-lg transition-all duration-300"
+    >
+      Try Again
+    </button>
+  </div>
 </div>
 
-<div *ngIf="!isLoading && !errorMessage && athleteProfile" class="profile">
-  <img [src]="athleteProfile.profile_medium" alt="Profile photo" />
-  <h4>{{ getFullName() }}</h4>
+<!-- Main Dashboard -->
+<div *ngIf="!isLoading && !errorMessage && athleteProfile && auraScore" class="min-h-screen bg-gradient-to-br from-strava-dark via-strava-gray to-gray-800">
+  <div class="container mx-auto px-4 py-8">
+    
+    <!-- Overall Score Hero Section -->
+    <div class="text-center mb-8 md:mb-12">
+      <div class="bg-white/5 backdrop-blur-sm rounded-2xl md:rounded-3xl p-6 md:p-12 max-w-4xl mx-auto">
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-lobster text-white mb-2">Your Aura Score</h1>
+        
+        <!-- Large Overall Score Display -->
+        <div class="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 mt-6 md:mt-8">
+          
+          <!-- Score Circle -->
+          <div class="relative">
+            <div class="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full border-4 md:border-6 lg:border-8 border-strava-orange/30 flex items-center justify-center bg-strava-orange/10">
+              <div class="text-center">
+                <div class="text-4xl md:text-5xl lg:text-7xl font-lobster text-strava-orange mb-1 md:mb-2">{{ auraScore.overallScore }}</div>
+                <div class="text-white font-semibold text-sm md:text-base">Overall</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grade and Rating -->
+          <div class="text-center lg:text-left">
+            <div class="text-3xl md:text-4xl lg:text-6xl font-lobster text-white mb-2">Grade {{ auraScore.overallGrade }}</div>
+            <div class="text-xl md:text-2xl text-strava-orange font-semibold mb-4">{{ auraScore.overallRating }}</div>
+            <div class="text-gray-300 text-base md:text-lg max-w-md px-4 lg:px-0">
+              Your comprehensive athletic profile analyzed across 5 key categories to determine your unique Strava personality.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Athlete Profile Summary -->
+    <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 md:p-8 max-w-4xl mx-auto mb-8 md:mb-12">
+      <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+        
+        <!-- Profile Photo -->
+        <div class="relative flex-shrink-0">
+          <img 
+            [src]="athleteProfile.profile_medium" 
+            alt="Profile photo" 
+            class="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-strava-orange/50"
+          />
+          <div *ngIf="athleteProfile.premium" class="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-yellow-500 text-black text-xs px-1.5 md:px-2 py-0.5 md:py-1 rounded-full font-bold">
+            PRO
+          </div>
+        </div>
+
+        <!-- Profile Info -->
+        <div class="text-center md:text-left flex-1 min-w-0">
+          <h2 class="text-2xl md:text-3xl font-lobster text-white mb-2 truncate">{{ getFullName() }}</h2>
+          <div class="flex flex-wrap justify-center md:justify-start gap-2 md:gap-4 text-sm md:text-base text-gray-300">
+            <span *ngIf="athleteProfile.city" class="flex items-center gap-1">
+              📍 <span class="truncate">{{ athleteProfile.city }}</span>
+            </span>
+            <span *ngIf="athleteProfile.state" class="truncate">{{ athleteProfile.state }}</span>
+            <span *ngIf="athleteProfile.country" class="truncate">{{ athleteProfile.country }}</span>
+          </div>
+          <div class="text-xs md:text-sm text-gray-400 mt-2">
+            Strava member since {{ getAccountAge() }}
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 gap-3 md:gap-4 text-center flex-shrink-0">
+          <div class="bg-white/5 rounded-lg p-2 md:p-3 min-w-[4rem]">
+            <div class="text-lg md:text-xl font-bold text-white">{{ auraScore.scores.length }}</div>
+            <div class="text-xs text-gray-300">Categories</div>
+          </div>
+          <div class="bg-white/5 rounded-lg p-2 md:p-3 min-w-[4rem]">
+            <div class="text-lg md:text-xl font-bold text-strava-orange">{{ getTopCategoryScore() }}</div>
+            <div class="text-xs text-gray-300">Top Score</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Score Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6 mb-8 md:mb-12">
+      <div 
+        *ngFor="let category of auraScore.scores" 
+        class="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6 hover:bg-white/15 transition-all duration-300 transform hover:scale-105 active:scale-95 touch-manipulation"
+      >
+        <!-- Category Header -->
+        <div class="text-center mb-3 md:mb-4">
+          <div class="w-10 h-10 md:w-12 md:h-12 bg-strava-orange/20 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+            <span class="text-xl md:text-2xl">{{ getCategoryIcon(category.categoryName) }}</span>
+          </div>
+          <h3 class="text-white font-lobster text-lg md:text-xl mb-2 leading-tight">{{ category.categoryName }}</h3>
+        </div>
+
+        <!-- Score Display -->
+        <div class="text-center mb-3 md:mb-4">
+          <div class="text-3xl md:text-4xl font-bold text-strava-orange mb-1">{{ category.score }}</div>
+          <div class="text-xs md:text-sm text-gray-300 mb-2">out of 100</div>
+          
+          <!-- Progress Bar -->
+          <div class="w-full bg-gray-600 rounded-full h-1.5 md:h-2 mb-2">
+            <div 
+              class="h-1.5 md:h-2 rounded-full transition-all duration-1000"
+              [ngClass]="getScoreColor(category.score)"
+              [style.width.%]="category.score"
+            ></div>
+          </div>
+          
+          <!-- Rating -->
+          <div class="text-strava-orange font-semibold text-xs md:text-sm truncate">{{ category.rating }}</div>
+        </div>
+
+        <!-- Perks -->
+        <div *ngIf="category.perks.length > 0" class="space-y-1">
+          <div class="text-xs text-gray-400 mb-2">Achievements:</div>
+          <div 
+            *ngFor="let perk of category.perks.slice(0, 2)" 
+            class="text-xs bg-strava-orange/20 text-strava-orange px-2 py-1 rounded-full text-center truncate"
+          >
+            {{ perk }}
+          </div>
+          <div *ngIf="category.perks.length > 2" class="text-xs text-gray-400 text-center">
+            +{{ category.perks.length - 2 }} more
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center bg-white/5 backdrop-blur-sm rounded-2xl p-4 md:p-8 max-w-4xl mx-auto">
+      <h2 class="text-xl md:text-2xl font-lobster text-white mb-4 md:mb-6">What's Next?</h2>
+      <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
+        <button class="px-4 md:px-6 py-2.5 md:py-3 bg-strava-orange hover:bg-orange-600 active:bg-orange-700 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation min-h-[2.75rem]">
+          <span>📤</span> Share My Score
+        </button>
+        <button 
+          (click)="retryLoadData()"
+          class="px-4 md:px-6 py-2.5 md:py-3 bg-transparent border-2 border-strava-orange text-strava-orange hover:bg-strava-orange hover:text-white active:bg-orange-700 font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation min-h-[2.75rem]"
+        >
+          <span>🔄</span> Refresh Data
+        </button>
+        <button class="px-4 md:px-6 py-2.5 md:py-3 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation min-h-[2.75rem]">
+          <span>💡</span> How to Improve
+        </button>
+      </div>
+    </div>
+
+  </div>
 </div>
