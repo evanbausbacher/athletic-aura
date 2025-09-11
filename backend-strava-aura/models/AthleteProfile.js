@@ -8,7 +8,7 @@ class AthleteProfile{
         this.city = data.city;
         this.state = data.state;
         this.country = data.country;
-        this.sex - data.sex;
+        this.sex = data.sex;
         this.premium = data.premium;
         this.summit = data.summit;
         this.created_at = data.created_at;

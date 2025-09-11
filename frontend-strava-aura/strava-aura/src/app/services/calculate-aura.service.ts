@@ -269,7 +269,7 @@ export class CalculateAuraService {
       rating = "Run Club Enthusiast";
     }
     else{
-      rating = "Not a fan of punishment";
+      rating = "Running was punishment in PE class";
     }
 
     return {
