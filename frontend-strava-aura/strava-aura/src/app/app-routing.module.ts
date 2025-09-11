@@ -5,12 +5,12 @@ import { HomeComponent } from './home/home.component';
 import { LandingComponent } from './landing/landing.component';
 
 const routes: Routes = [
-  { path: '', component: LandingComponent},
-  { path: 'aura', component: HomeComponent }
+  { path: '', component: LandingComponent },
+  { path: 'aura', component: HomeComponent },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -1,4 +1,13 @@
-<div *ngIf="athleteProfile">
-    <img [src]="athleteProfile.profile_medium"><img>
-    <h4>{{ getFullName() }}</h4>
+<div *ngIf="isLoading" class="loading">
+  <p>Loading your Strava Aura...</p>
+</div>
+
+<div *ngIf="errorMessage" class="error">
+  <p>{{ errorMessage }}</p>
+  <button (click)="retryLoadData()">Retry</button>
+</div>
+
+<div *ngIf="!isLoading && !errorMessage && athleteProfile" class="profile">
+  <img [src]="athleteProfile.profile_medium" alt="Profile photo" />
+  <h4>{{ getFullName() }}</h4>
 </div>

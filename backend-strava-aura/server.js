@@ -16,11 +16,58 @@ app.use(express.json());
 
 // Set up Session
 app.use(session({
-    secret: '1Um8mYy1V7jkfnQI0ycdLu35dTJb6Mja',
+    secret: process.env.SESSION_SECRET || 'fallback-dev-secret-not-for-production',
     resave: false,
     saveUninitialized: true,
     cookie: { secure : false } // TODO: Set to true in production
 }));
+
+// Helper function to refresh access token
+async function refreshAccessToken(req) {
+    try {
+        const response = await axios.post('https://www.strava.com/oauth/token', {
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET,
+            grant_type: 'refresh_token',
+            refresh_token: req.session.refresh_token
+        });
+
+        const { access_token, refresh_token, expires_at } = response.data;
+        
+        // Update session with new tokens
+        req.session.access_token = access_token;
+        req.session.refresh_token = refresh_token;
+        req.session.expires_at = expires_at;
+
+        console.log('Access token refreshed successfully');
+        return { access_token, refresh_token, expires_at };
+    } catch (error) {
+        console.error('Error refreshing access token:', error.response?.data || error.message);
+        throw new Error('Failed to refresh access token');
+    }
+}
+
+// Helper function to check and refresh token if needed
+async function ensureValidToken(req, res) {
+    const { access_token, refresh_token, expires_at } = req.session;
+
+    if (!access_token || !refresh_token) {
+        return res.status(401).json({ error: 'No authentication tokens found. Please re-authenticate.' });
+    }
+
+    // Check if token is expired (with 5 minute buffer)
+    const bufferTime = 5 * 60 * 1000; // 5 minutes in milliseconds
+    if (Date.now() >= (expires_at * 1000) - bufferTime) {
+        console.log("Access Token expired or expiring soon, refreshing...");
+        try {
+            await refreshAccessToken(req);
+        } catch (error) {
+            return res.status(401).json({ error: 'Failed to refresh access token. Please re-authenticate.' });
+        }
+    }
+
+    return null; // No error, token is valid
+}
 
 // Root Route
 app.get('/', (req, res) => {
@@ -75,63 +122,66 @@ app.get('/api/auth/callback', async (req, res) => {
 });
 
 app.get('/api/profile', async (req, res) => {
-    const {access_token, refresh_token, expires_at } = req.session;
-
-    // Check Expiration
-    if (Date.now() >= expires_at * 1000){
-        console.log("Access Token expired, refresing...")
-
-        // this.refresh
-    }
+    // Ensure we have a valid token
+    const tokenError = await ensureValidToken(req, res);
+    if (tokenError) return; // Response already sent
 
     // Make call to Strava API
-    try{
+    try {
         const profileResponse = await axios.get('https://www.strava.com/api/v3/athlete', {
             headers: {
-                Authorization : `Bearer ${req.session.access_token}`
+                Authorization: `Bearer ${req.session.access_token}`
             }
         });
 
-        // console.log(profileResponse.data);
-
         const profile = new AthleteProfile(profileResponse.data);
-
         res.json(profile);
-    }
-    catch (err){
-        console.error('Error fetching athlete profile', err);
-        res.status(500).send('Error fetching athlete profile');
-    }
 
+    } catch (err) {
+        console.error('Error fetching athlete profile:', err.response?.data || err.message);
+        
+        if (err.response?.status === 401) {
+            res.status(401).json({ error: 'Authentication failed. Please re-authenticate.' });
+        } else {
+            res.status(500).json({ error: 'Error fetching athlete profile' });
+        }
+    }
 });
 
 
-app.get('/api/stats/:profileId', async (req ,res) => {
+app.get('/api/stats/:profileId', async (req, res) => {
     const { profileId } = req.params;
-    const {access_token, refresh_token, expires_at } = req.session;
 
-    // Check Expiration
-    if (Date.now() >= expires_at * 1000){
-        console.log("Access Token expired, refresing...")
-
-        // this.refresh
+    // Input validation
+    if (!profileId || isNaN(profileId)) {
+        return res.status(400).json({ error: 'Invalid profile ID provided' });
     }
 
+    // Ensure we have a valid token
+    const tokenError = await ensureValidToken(req, res);
+    if (tokenError) return; // Response already sent
+
     // Make call to Strava API
-    try{
+    try {
         const statsResponse = await axios.get(`https://www.strava.com/api/v3/athletes/${profileId}/stats`, {
             headers: {
-                Authorization : `Bearer ${req.session.access_token}`
+                Authorization: `Bearer ${req.session.access_token}`
             }
         });
 
         const athleteStats = new AthleteStats(statsResponse.data);
-
         res.json(athleteStats);
-    }
-    catch (err){
-        console.error('Error fetching athlete stats', err);
-        res.status(500).send('Error fetching athlete stats');
+
+    } catch (err) {
+        console.error('Error fetching athlete stats:', err.response?.data || err.message);
+        
+        if (err.response?.status === 401) {
+            res.status(401).json({ error: 'Authentication failed. Please re-authenticate.' });
+        } else if (err.response?.status === 404) {
+            res.status(404).json({ error: 'Athlete not found' });
+        } else {
+            res.status(500).json({ error: 'Error fetching athlete stats' });
+        }
     }
 });
 

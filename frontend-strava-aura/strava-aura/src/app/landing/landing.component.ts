@@ -5,23 +5,21 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.css'
+  styleUrl: './landing.component.css',
 })
 export class LandingComponent {
-  hasToken : boolean = false;
+  hasToken: boolean = false;
 
   constructor(
-    private authService : AuthService, 
-    private route : ActivatedRoute,
-    private router : Router
-  ) { }
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
-  ngOnInit(): void {
-
-  }
+  ngOnInit(): void {}
 
   // Trigger Strava OAuth2 authentication
-  authenticateWithStrava(){
+  authenticateWithStrava() {
     this.authService.redirectToStravaAuth();
   }
 }
