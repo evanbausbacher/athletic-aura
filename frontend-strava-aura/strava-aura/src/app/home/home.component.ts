@@ -4,11 +4,13 @@ import { IAthleteProfile } from '../models/athlete-profile.model';
 import { IAthleteStats } from '../models/athlete-stats.model';
 import { IScore } from '../models/score.model';
 import { CalculateAuraService } from '../services/calculate-aura.service';
+import { fadeInAnimation, staggerAnimation, cardHoverAnimation, scoreRevealAnimation } from '../shared/animations';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
+  animations: [fadeInAnimation, staggerAnimation, cardHoverAnimation, scoreRevealAnimation]
 })
 export class HomeComponent implements OnInit {
   athleteProfile: IAthleteProfile | null = null;
@@ -96,9 +98,28 @@ export class HomeComponent implements OnInit {
   }
 
   getScoreColor(score: number): string {
-    if (score >= 80) return 'bg-success';
-    if (score >= 60) return 'bg-strava-orange';
-    if (score >= 40) return 'bg-warning';
-    return 'bg-error';
+    if (score >= 90) return 'bg-emerald-500';
+    if (score >= 80) return 'bg-green-500';
+    if (score >= 70) return 'bg-strava-orange';
+    if (score >= 60) return 'bg-yellow-400';
+    if (score >= 40) return 'bg-yellow-500';
+    return 'bg-red-500';
   }
+
+  getScoreTextColor(score: number): string {
+    if (score >= 80) return 'text-emerald-400';
+    if (score >= 60) return 'text-strava-orange';
+    if (score >= 40) return 'text-yellow-400';
+    return 'text-red-400';
+  }
+
+  getScoreBadge(score: number): string {
+    if (score >= 90) return '🏆 Legendary';
+    if (score >= 80) return '🥇 Elite';
+    if (score >= 70) return '🥈 Strong';
+    if (score >= 60) return '🥉 Good';
+    if (score >= 40) return '📈 Growing';
+    return '🌱 Starting';
+  }
+
 }
