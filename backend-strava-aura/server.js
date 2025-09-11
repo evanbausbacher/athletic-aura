@@ -185,6 +185,62 @@ app.get('/api/stats/:profileId', async (req, res) => {
     }
 });
 
+// Image proxy endpoint to bypass CORS for profile images
+app.get('/api/proxy/image', async (req, res) => {
+    const { url } = req.query;
+    
+    // Validate URL parameter
+    if (!url) {
+        return res.status(400).json({ error: 'URL parameter is required' });
+    }
+    
+    // Security: Only allow Strava CDN URLs
+    const allowedDomains = [
+        'dgalywyr863hv.cloudfront.net',
+        'graph.facebook.com',
+        'lh3.googleusercontent.com',
+        'd3nn82uaxijpm6.cloudfront.net'
+    ];
+    
+    try {
+        const urlObj = new URL(url);
+        if (!allowedDomains.includes(urlObj.hostname)) {
+            return res.status(403).json({ error: 'Domain not allowed' });
+        }
+        
+        // Fetch the image
+        const imageResponse = await axios.get(url, {
+            responseType: 'arraybuffer',
+            timeout: 10000, // 10 second timeout
+            headers: {
+                'User-Agent': 'Strava-Aura/1.0'
+            }
+        });
+        
+        // Set appropriate headers
+        const contentType = imageResponse.headers['content-type'] || 'image/jpeg';
+        res.set({
+            'Content-Type': contentType,
+            'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'http://localhost:4200',
+            'Cache-Control': 'public, max-age=3600' // Cache for 1 hour
+        });
+        
+        // Send the image data
+        res.send(imageResponse.data);
+        
+    } catch (error) {
+        console.error('Error proxying image:', error.message);
+        
+        if (error.code === 'ETIMEDOUT') {
+            res.status(408).json({ error: 'Request timeout' });
+        } else if (error.response?.status) {
+            res.status(error.response.status).json({ error: 'Image fetch failed' });
+        } else {
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+});
+
 app.listen(port, () => {
     console.log('Server listening on port ', port);
 });

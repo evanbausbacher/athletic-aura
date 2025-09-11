@@ -1,0 +1,46 @@
+/* Mobile performance optimizations */
+:host {
+  contain: layout;
+  will-change: auto;
+}
+
+/* Reduce repaints and layout shifts */
+.container {
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Optimize backdrop blur for mobile */
+@media (max-width: 768px) {
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+/* Prevent layout shift during animations */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100svh; /* Use small viewport height for mobile */
+}
+
+/* Optimize touch interactions */
+button, .touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Reduce animation on mobile for performance */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* GPU acceleration for smooth animations */
+.bg-gradient-to-br {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

@@ -165,7 +165,7 @@ export class HomeComponent implements OnInit {
       rating: this.auraScore.overallRating,
       topCategories: this.getTopCategories(3),
       randomPerks: this.getRandomPerks(3),
-      profileImage: this.athleteProfile.profile || '',
+      profileImage: this.athleteProfile.profile_medium || this.athleteProfile.profile || '',
       userName: this.getFullName()
     };
 

@@ -21,7 +21,7 @@
 </div>
 
 <!-- Main Dashboard -->
-<div *ngIf="!isLoading && !errorMessage && athleteProfile && auraScore" class="min-h-screen bg-gradient-to-br from-strava-dark via-strava-gray to-gray-800" [@fadeIn]>
+<div *ngIf="!isLoading && !errorMessage && athleteProfile && auraScore" class="min-h-screen bg-gradient-to-br from-strava-dark via-strava-gray to-gray-800">
   <div class="container mx-auto px-4 py-8">
     
     <!-- Overall Score Hero Section -->
@@ -104,13 +104,13 @@
     </div>
 
     <!-- Data Visualization Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12 max-w-6xl mx-auto" [@fadeIn]>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12 max-w-6xl mx-auto">
       
       <!-- Radar Chart -->
-      <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 md:p-6">
+      <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 md:p-6" [style.min-height.px]="300">
         <h3 class="text-xl md:text-2xl font-lobster text-white text-center mb-4 md:mb-6">Multi-Sport Profile</h3>
         <div class="flex justify-center">
-          <app-score-radar-chart [scores]="auraScore.scores"></app-score-radar-chart>
+          <app-score-radar-chart [scores]="auraScore.scores" [style.min-height.px]="200"></app-score-radar-chart>
         </div>
         <p class="text-gray-300 text-center text-sm mt-4">
           Your athletic capabilities visualized across all categories
@@ -118,7 +118,7 @@
       </div>
 
       <!-- Bar Chart -->
-      <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 md:p-6">
+      <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 md:p-6" [style.min-height.px]="350">
         <h3 class="text-xl md:text-2xl font-lobster text-white text-center mb-4 md:mb-6">Category Comparison</h3>
         <div class="h-64 md:h-80">
           <app-score-bar-chart [scores]="auraScore.scores"></app-score-bar-chart>
@@ -188,12 +188,6 @@
           class="px-4 md:px-6 py-2.5 md:py-3 bg-strava-orange hover:bg-orange-600 hover:shadow-lg hover:shadow-strava-orange/30 active:bg-orange-700 active:scale-95 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation min-h-[2.75rem] transform hover:-translate-y-1"
         >
           <span class="text-lg transition-transform duration-300 hover:scale-110">📤</span> Share My Score
-        </button>
-        <button 
-          (click)="retryLoadData()"
-          class="px-4 md:px-6 py-2.5 md:py-3 bg-transparent border-2 border-strava-orange text-strava-orange hover:bg-strava-orange hover:text-white hover:shadow-lg hover:shadow-strava-orange/30 active:bg-orange-700 active:scale-95 font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation min-h-[2.75rem] transform hover:-translate-y-1"
-        >
-          <span class="text-lg transition-transform duration-300 hover:rotate-180">🔄</span> Refresh Data
         </button>
         <button class="px-4 md:px-6 py-2.5 md:py-3 bg-white/10 hover:bg-white/20 hover:shadow-lg active:bg-white/30 active:scale-95 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation min-h-[2.75rem] transform hover:-translate-y-1">
           <span class="text-lg transition-transform duration-300 hover:scale-110">💡</span> How to Improve

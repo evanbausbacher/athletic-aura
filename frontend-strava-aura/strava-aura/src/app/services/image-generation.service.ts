@@ -113,9 +113,21 @@ export class ImageGenerationService {
 
   private async drawProfileImage(profileImageUrl: string): Promise<void> {
     return new Promise((resolve) => {
+      console.log('Attempting to load profile image:', profileImageUrl);
+      
+      if (!profileImageUrl || profileImageUrl.trim() === '') {
+        console.warn('Empty profile image URL, using placeholder');
+        this.drawProfilePlaceholder();
+        resolve();
+        return;
+      }
+
+      // Use proxy endpoint to bypass CORS
+      const proxyUrl = `/api/proxy/image?url=${encodeURIComponent(profileImageUrl)}`;
       const img = new Image();
-      img.crossOrigin = 'anonymous'; // Handle CORS for external images
+      
       img.onload = () => {
+        console.log('Profile image loaded successfully via proxy');
         // Draw circular profile image
         const size = 180;
         const x = (this.WIDTH - size) / 2;
@@ -139,26 +151,92 @@ export class ImageGenerationService {
         
         resolve();
       };
-      img.onerror = () => {
-        // Draw placeholder circle if image fails
-        const size = 180;
-        const x = (this.WIDTH - size) / 2;
-        const y = 240;
-        
-        this.ctx.fillStyle = this.COLORS.secondary;
-        this.ctx.beginPath();
-        this.ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        this.ctx.fillStyle = this.COLORS.text;
-        this.ctx.font = 'bold 60px Inter';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('👤', x + size/2, y + size/2 + 20);
-        
+      
+      img.onerror = (error) => {
+        console.error('Failed to load profile image via proxy:', error, 'Proxy URL:', proxyUrl);
+        console.log('Falling back to placeholder');
+        this.drawProfilePlaceholder();
         resolve();
       };
-      img.src = profileImageUrl;
+      
+      // Load via our proxy endpoint (same-origin, no CORS issues)
+      img.src = proxyUrl;
     });
+  }
+
+  private loadImageFallback(profileImageUrl: string, resolve: () => void): void {
+    console.log('Trying fallback method for profile image');
+    
+    // Create a proxy/conversion method using canvas to avoid CORS
+    fetch(profileImageUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        const objectURL = URL.createObjectURL(blob);
+        const img = new Image();
+        
+        img.onload = () => {
+          console.log('Profile image loaded via fetch/blob method');
+          const size = 180;
+          const x = (this.WIDTH - size) / 2;
+          const y = 240;
+          
+          this.ctx.save();
+          this.ctx.beginPath();
+          this.ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI * 2);
+          this.ctx.closePath();
+          this.ctx.clip();
+          
+          this.ctx.drawImage(img, x, y, size, size);
+          this.ctx.restore();
+          
+          // Add border
+          this.ctx.strokeStyle = this.COLORS.text;
+          this.ctx.lineWidth = 6;
+          this.ctx.beginPath();
+          this.ctx.arc(x + size/2, y + size/2, size/2 + 3, 0, Math.PI * 2);
+          this.ctx.stroke();
+          
+          URL.revokeObjectURL(objectURL);
+          resolve();
+        };
+        
+        img.onerror = () => {
+          console.warn('Fetch/blob method also failed, using placeholder');
+          URL.revokeObjectURL(objectURL);
+          this.drawProfilePlaceholder();
+          resolve();
+        };
+        
+        img.src = objectURL;
+      })
+      .catch(() => {
+        console.warn('Fetch method failed, using placeholder');
+        this.drawProfilePlaceholder();
+        resolve();
+      });
+  }
+
+  private drawProfilePlaceholder(): void {
+    const size = 180;
+    const x = (this.WIDTH - size) / 2;
+    const y = 240;
+    
+    this.ctx.fillStyle = this.COLORS.secondary;
+    this.ctx.beginPath();
+    this.ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI * 2);
+    this.ctx.fill();
+    
+    this.ctx.fillStyle = this.COLORS.text;
+    this.ctx.font = 'bold 60px Inter';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('👤', x + size/2, y + size/2 + 20);
+    
+    // Add border
+    this.ctx.strokeStyle = this.COLORS.text;
+    this.ctx.lineWidth = 6;
+    this.ctx.beginPath();
+    this.ctx.arc(x + size/2, y + size/2, size/2 + 3, 0, Math.PI * 2);
+    this.ctx.stroke();
   }
 
   private drawUserName(userName: string): void {
