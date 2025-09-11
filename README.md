@@ -1,7 +1,5 @@
 # 🔥 Strava Aura
 
-**Live at: [athleticaura.com](https://athleticaura.com)**
-
 A full-stack web application that analyzes your Strava data and generates a gamified "aura score" - because your athletic achievements deserve more than just kudos.
 
 ## What's Your Athletic Aura?
