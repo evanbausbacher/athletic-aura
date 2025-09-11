@@ -6,13 +6,10 @@ export interface IAthleteStats {
 
   recent_ride_totals: IActivityTotal;
   recent_run_totals: IActivityTotal;
-  recent_swim_totals: IActivityTotal;
 
   ytd_ride_totals: IActivityTotal;
   ytd_run_totals: IActivityTotal;
-  ytd_swim_totals: IActivityTotal;
 
   all_ride_totals: IActivityTotal;
   all_run_totals: IActivityTotal;
-  all_swim_totals: IActivityTotal;
 }

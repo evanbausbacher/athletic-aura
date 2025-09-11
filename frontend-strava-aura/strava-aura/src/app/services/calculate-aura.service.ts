@@ -9,34 +9,28 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class CalculateAuraService {
-  // Strava Aura - an overall score evaluating an Athlete on Strava, based on a number of factors
-  // Factors:
-  // Profile Completeness : Has Bio / Has Profile Photo / Has City
-  // Account Longevity : prioritize older account users
-  // Multi sport athlete
-  // Epic distances / climbs
-  // Consistency
-  // Social Stats
+  // Strava Aura - an overall score evaluating an Athlete on Strava, based on 4 categories:
+  // 1. Profile Completeness : Has Bio / Has Profile Photo / Has City / Account Age
+  // 2. Cycling Score : Recent activity, distance, elevation, total hours
+  // 3. Running Score : Recent runs, distance, elevation, total hours  
+  // 4. Epic Score : Biggest single ride distance and biggest climb
   constructor() {}
 
   profileScore: IScoreCategory | undefined;
   rideScore: IScoreCategory | undefined;
   runScore: IScoreCategory | undefined;
-  swimScore: IScoreCategory | undefined;
   epicScore: IScoreCategory | undefined;
 
   generateScore(profile: IAthleteProfile, stats: IAthleteStats): IScore {
     this.profileScore = this.calculateCompletenessScore(profile);
     this.rideScore = this.calculateRideScore(stats);
     this.runScore = this.calculateRunScore(stats);
-    this.swimScore = this.calculateSwimScore(stats);
     this.epicScore = this.calculateEpicScore(stats);
 
     const scoreCategories: IScoreCategory[] = [
       this.profileScore,
       this.rideScore,
       this.runScore,
-      this.swimScore,
       this.epicScore,
     ];
 
@@ -55,15 +49,54 @@ export class CalculateAuraService {
   }
 
   private calculateOverallScore(): number {
-    return 0;
+    if (!this.profileScore || !this.rideScore || !this.runScore || !this.epicScore) {
+      return 0;
+    }
+    
+    // Calculate weighted average (cycling and running weighted more heavily)
+    const totalScore = (
+      this.profileScore.score * 1.0 +
+      this.rideScore.score * 1.5 +
+      this.runScore.score * 1.5 +
+      this.epicScore.score * 1.2
+    );
+    
+    const totalWeight = 1.0 + 1.5 + 1.5 + 1.2; // = 5.2
+    return Math.round(totalScore / totalWeight);
   }
 
   private calculateOverallGrade(): string {
-    return 'B';
+    const score = this.calculateOverallScore();
+    
+    if (score >= 90) return 'A+';
+    if (score >= 85) return 'A';
+    if (score >= 80) return 'A-';
+    if (score >= 75) return 'B+';
+    if (score >= 70) return 'B';
+    if (score >= 65) return 'B-';
+    if (score >= 60) return 'C+';
+    if (score >= 55) return 'C';
+    if (score >= 50) return 'C-';
+    if (score >= 45) return 'D+';
+    if (score >= 40) return 'D';
+    return 'F';
   }
 
   private calculateOverallRating(): string {
-    return 'Nice';
+    const score = this.calculateOverallScore();
+    
+    if (score >= 95) return 'Absolute Legend';
+    if (score >= 90) return 'Elite Athlete';
+    if (score >= 85) return 'Strava Superstar';
+    if (score >= 80) return 'Epic Endurist';
+    if (score >= 75) return 'Solid Performer';
+    if (score >= 70) return 'Active Enthusiast';
+    if (score >= 65) return 'Weekend Warrior';
+    if (score >= 60) return 'Getting There';
+    if (score >= 55) return 'Casual Movement Fan';
+    if (score >= 50) return 'Beginner Plus';
+    if (score >= 40) return 'Just Starting';
+    return 'Couch Potato';
   }
 
   private calculateCompletenessScore(profile: IAthleteProfile): IScoreCategory {
@@ -262,59 +295,6 @@ export class CalculateAuraService {
     };
   }
 
-  private calculateSwimScore(stats: IAthleteStats): IScoreCategory {
-    let score = 0;
-    let perks: string[] = [];
-    let index: number = 0;
-    let rating: string = '';
-
-    if (stats.recent_swim_totals.count >= 20) {
-      score += 20;
-      perks[index] = 'build alert';
-      index++;
-    } else if (stats.recent_swim_totals.count > 9) {
-      score += 10;
-    }
-
-    if (stats.ytd_swim_totals.count > 10) {
-      score += 10;
-    }
-
-    let ytdDistance = stats.ytd_swim_totals.distance / 1000;
-    if (ytdDistance > 10_000) {
-      score += 20;
-      perks[index] = 'fish';
-      index++;
-    }
-
-    let totalHoursEver = stats.all_swim_totals.elapsed_time / 3600;
-    if (totalHoursEver > 1000) {
-      if (totalHoursEver > 5000) {
-        score += 40;
-        perks[index] = 'absolute master';
-        index++;
-      } else {
-        score += 20;
-        perks[index] = 'extremely seasoned';
-        index++;
-      }
-    }
-
-    if (score > 69) {
-      rating = 'Phelps';
-    } else if (score >= 40) {
-      rating = 'Knows how to swim';
-    } else {
-      rating = 'Beach guy';
-    }
-
-    return {
-      categoryName: 'Swimming Score',
-      score: score,
-      perks: perks,
-      rating: rating,
-    };
-  }
 
   private calculateEpicScore(stats: IAthleteStats): IScoreCategory {
     let score = 0;

@@ -92,7 +92,6 @@ export class HomeComponent implements OnInit {
       'Profile Completeness': '👤',
       'Cycling Score': '🚴',
       'Running Score': '🏃',
-      'Swimming Score': '🏊',
       'Epic Score': '⛰️'
     };
     return icons[categoryName] || '🏅';

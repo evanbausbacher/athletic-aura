@@ -47,7 +47,7 @@
             <div class="text-3xl md:text-4xl lg:text-6xl font-lobster text-white mb-2">Grade {{ auraScore.overallGrade }}</div>
             <div class="text-xl md:text-2xl text-strava-orange font-semibold mb-4">{{ auraScore.overallRating }}</div>
             <div class="text-gray-300 text-base md:text-lg max-w-md px-4 lg:px-0">
-              Your comprehensive athletic profile analyzed across 5 key categories to determine your unique Strava personality.
+              Your comprehensive athletic profile analyzed across 4 key categories to determine your unique Strava personality.
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@
     </div>
 
     <!-- Category Score Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6 mb-8 md:mb-12">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
       <div 
         *ngFor="let category of auraScore.scores" 
         class="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6 hover:bg-white/15 transition-all duration-300 transform hover:scale-105 active:scale-95 touch-manipulation"
@@ -128,20 +128,17 @@
           </div>
           
           <!-- Rating -->
-          <div class="text-strava-orange font-semibold text-xs md:text-sm truncate">{{ category.rating }}</div>
+          <div class="text-strava-orange font-semibold text-xs md:text-sm text-center break-words">{{ category.rating }}</div>
         </div>
 
         <!-- Perks -->
         <div *ngIf="category.perks.length > 0" class="space-y-1">
           <div class="text-xs text-gray-400 mb-2">Achievements:</div>
           <div 
-            *ngFor="let perk of category.perks.slice(0, 2)" 
-            class="text-xs bg-strava-orange/20 text-strava-orange px-2 py-1 rounded-full text-center truncate"
+            *ngFor="let perk of category.perks" 
+            class="text-xs bg-strava-orange/20 text-strava-orange px-2 py-1 rounded-full text-center break-words"
           >
             {{ perk }}
-          </div>
-          <div *ngIf="category.perks.length > 2" class="text-xs text-gray-400 text-center">
-            +{{ category.perks.length - 2 }} more
           </div>
         </div>
       </div>
