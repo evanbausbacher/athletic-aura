@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { IScoreCategory } from '../../models/score-category.model';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
@@ -24,15 +24,11 @@ Chart.register(...registerables);
     }
   `]
 })
-export class ScoreRadarChartComponent implements OnInit, OnChanges, AfterViewInit {
+export class ScoreRadarChartComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() scores: IScoreCategory[] = [];
   @ViewChild('radarChart', { static: true }) radarChartRef!: ElementRef<HTMLCanvasElement>;
   
   private chart: Chart | null = null;
-
-  ngOnInit(): void {
-    // Component initialization
-  }
 
   ngAfterViewInit(): void {
     if (this.scores.length > 0) {
