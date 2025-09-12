@@ -22,7 +22,21 @@
 
 <!-- Main Dashboard -->
 <div *ngIf="!isLoading && !errorMessage && athleteProfile && auraScore" class="min-h-screen bg-gradient-to-br from-strava-dark via-strava-gray to-gray-800">
-  <div class="container mx-auto px-4 py-8">
+  
+  <!-- Back Button -->
+  <div class="container mx-auto px-4 pt-4">
+    <button 
+      (click)="goBackToLanding()"
+      class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 backdrop-blur-sm"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      <span class="text-sm">Back to Home</span>
+    </button>
+  </div>
+  
+  <div class="container mx-auto px-4 py-4">
     
     <!-- Overall Score Hero Section -->
     <div class="text-center mb-8 md:mb-12" [@scoreReveal]>
@@ -51,7 +65,7 @@
             <div class="text-3xl md:text-4xl lg:text-6xl font-lobster text-white mb-2">Grade {{ auraScore.overallGrade }}</div>
             <div class="text-xl md:text-2xl text-strava-orange font-semibold mb-4">{{ auraScore.overallRating }}</div>
             <div class="text-gray-300 text-base md:text-lg max-w-md px-4 lg:px-0">
-              Your comprehensive athletic profile analyzed across 4 key categories to determine your unique Strava personality.
+              Your overall aura based on a your complete profile, highly scientific and researched algorithm.
             </div>
           </div>
         </div>
@@ -148,8 +162,6 @@
         <!-- Score Display -->
         <div class="text-center mb-3 md:mb-4">
           <div class="text-3xl md:text-4xl font-bold mb-1" [ngClass]="getScoreTextColor(category.score)">{{ category.score }}</div>
-          <div class="text-xs md:text-sm mb-2" [ngClass]="getScoreTextColor(category.score)">{{ getScoreBadge(category.score) }}</div>
-          
           <!-- Animated Progress Bar -->
           <div class="w-full bg-gray-600/50 rounded-full h-1.5 md:h-2 mb-2 relative overflow-hidden">
             <div 
@@ -221,9 +233,6 @@
                 <div class="flex items-center gap-2 mt-1">
                   <span class="text-sm font-semibold" [ngClass]="getScoreTextColor(categoryTips.currentScore)">
                     {{ categoryTips.currentScore }}/100
-                  </span>
-                  <span class="text-xs" [ngClass]="getScoreTextColor(categoryTips.currentScore)">
-                    {{ getScoreBadge(categoryTips.currentScore) }}
                   </span>
                 </div>
               </div>

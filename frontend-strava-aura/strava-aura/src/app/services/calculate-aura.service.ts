@@ -59,7 +59,7 @@ export class CalculateAuraService {
       this.epicScore.score * 1.2
     );
     
-    const totalWeight = 1.0 + 1.5 + 1.5 + 1.2; // = 5.2
+    const totalWeight = 4 // 1.0 + 1.5 + 1.5 + 1.2; // = 5.2
     return Math.round(totalScore / totalWeight);
   }
 
@@ -111,6 +111,10 @@ export class CalculateAuraService {
     if (profile.profile_medium) {
       score += 10;
     }
+    else{
+      perks[index] = 'too lazy to upload photo';
+      index++;
+    }
 
     if (profile.bio) {
       score += 10;
@@ -126,7 +130,7 @@ export class CalculateAuraService {
       index++;
     }
 
-    const coolStates: string[] = ['Texas', 'Florida', 'Colorado', 'Wisconsin', 'Utah', 'California'];
+    const coolStates: string[] = ['Texas', 'Florida', 'Colorado', 'Utah', 'California'];
     if (coolStates.includes(profile.state)) {
       score += 10;
       perks[index] = 'baller state';
@@ -147,11 +151,11 @@ export class CalculateAuraService {
 
     let rating: string;
     if (score >= 70) {
-      rating = 'W Prof';
+      rating = 'w rizz';
     } else if (score > 50) {
-      rating = 'Mid Prof';
+      rating = 'straight mid';
     } else {
-      rating = 'Down bad prof';
+      rating = 'attrocious prof';
     }
 
     return {

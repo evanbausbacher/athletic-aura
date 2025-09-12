@@ -157,15 +157,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     return 'text-red-400';
   }
 
-  getScoreBadge(score: number): string {
-    if (score >= 90) return '🏆 Legendary';
-    if (score >= 80) return '🥇 Elite';
-    if (score >= 70) return '🥈 Strong';
-    if (score >= 60) return '🥉 Good';
-    if (score >= 40) return '📈 Growing';
-    return '🌱 Starting';
-  }
-
   getTopCategories(count = 3): {name: string; score: number; rating: string; emoji: string}[] {
     if (!this.auraScore?.scores) return [];
     
@@ -337,6 +328,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error sharing score:', error);
     }
+  }
+
+  goBackToLanding(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 
 }
