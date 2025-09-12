@@ -6,6 +6,7 @@ import { LandingComponent } from './landing/landing.component';
 const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'aura', component: HomeComponent },
+  { path: '**', redirectTo: '' } // Wildcard route for 404s
 ];
 
 @NgModule({
