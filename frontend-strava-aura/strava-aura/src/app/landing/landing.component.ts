@@ -19,6 +19,12 @@ export class LandingComponent implements OnInit {
   ngOnInit(): void {
     // Ensure default SEO is set for the landing page
     this.seoService.resetToDefault();
+
+    // Check if user is already authenticated and redirect if so
+    if (this.authService.isAuthenticated()) {
+      console.log('User already authenticated, redirecting to aura page');
+      this.router.navigate(['/aura']);
+    }
   }
 
   // Trigger Strava OAuth2 authentication

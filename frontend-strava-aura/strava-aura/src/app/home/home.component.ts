@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
+import { AuthService } from '../services/auth.service';
 import { IAthleteProfile } from '../models/athlete-profile.model';
 import { IAthleteStats } from '../models/athlete-stats.model';
 import { IScore } from '../models/score.model';
@@ -27,8 +29,22 @@ export class HomeComponent implements OnInit, OnDestroy {
   private scoreService = inject(CalculateAuraService);
   private imageService = inject(ImageGenerationService);
   private seoService = inject(SeoService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   ngOnInit(): void {
+    // Handle auth callback tokens if they exist in URL
+    if (this.authService.handleAuthCallback()) {
+      console.log('Auth tokens received and stored');
+    }
+
+    // Check if user is authenticated before loading data
+    if (!this.authService.isAuthenticated()) {
+      console.log('User not authenticated, redirecting to landing page');
+      this.router.navigate(['/']);
+      return;
+    }
+
     this.loadAthleteData();
   }
 
@@ -78,7 +94,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error fetching profile:', error);
-        this.errorMessage = 'Failed to load athlete profile. Please try again.';
+        if (error.message && error.message.includes('Authentication required')) {
+          this.errorMessage = 'Authentication expired. Please sign in again.';
+          this.authService.logout();
+          this.router.navigate(['/']);
+        } else {
+          this.errorMessage = 'Failed to load athlete profile. Please try again.';
+        }
         this.isLoading = false;
       },
     });

@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const session = require('express-session');
+// const session = require('express-session'); // No longer needed for token-based auth
 const AthleteProfile = require('./models/AthleteProfile');
 const AthleteStats = require('./models/AthleteStats');
 
@@ -17,36 +17,20 @@ app.use(cors({
 })); 
 app.use(express.json());
 
-// Set up Session
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallback-dev-secret-not-for-production',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-}));
+// Session middleware removed - using token-based authentication instead
 
 // Helper function to refresh access token
-async function refreshAccessToken(req) {
+async function refreshAccessToken(refreshToken) {
     try {
         const response = await axios.post('https://www.strava.com/oauth/token', {
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET,
             grant_type: 'refresh_token',
-            refresh_token: req.session.refresh_token
+            refresh_token: refreshToken
         });
 
         const { access_token, refresh_token, expires_at } = response.data;
         
-        // Update session with new tokens
-        req.session.access_token = access_token;
-        req.session.refresh_token = refresh_token;
-        req.session.expires_at = expires_at;
-
         console.log('Access token refreshed successfully');
         return { access_token, refresh_token, expires_at };
     } catch (error) {
@@ -55,26 +39,13 @@ async function refreshAccessToken(req) {
     }
 }
 
-// Helper function to check and refresh token if needed
-async function ensureValidToken(req, res) {
-    const { access_token, refresh_token, expires_at } = req.session;
-
-    if (!access_token || !refresh_token) {
-        return res.status(401).json({ error: 'No authentication tokens found. Please re-authenticate.' });
+// Helper function to extract and validate token from Authorization header
+function getTokenFromHeader(req) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return null;
     }
-
-    // Check if token is expired (with 5 minute buffer)
-    const bufferTime = 5 * 60 * 1000; // 5 minutes in milliseconds
-    if (Date.now() >= (expires_at * 1000) - bufferTime) {
-        console.log("Access Token expired or expiring soon, refreshing...");
-        try {
-            await refreshAccessToken(req);
-        } catch (error) {
-            return res.status(401).json({ error: 'Failed to refresh access token. Please re-authenticate.' });
-        }
-    }
-
-    return null; // No error, token is valid
+    return authHeader.substring(7); // Remove 'Bearer ' prefix
 }
 
 // Root Route
@@ -111,18 +82,10 @@ app.get('/api/auth/callback', async (req, res) => {
 
         const { access_token, refresh_token, expires_at } = response.data;
 
-        // Store Tokens in Session
-        req.session.access_token = access_token;
-        req.session.refresh_token = refresh_token;
-        req.session.expires_at = expires_at;
-
-        // Redirect to frontend without tokens in URL
-        const frontendUrl = `${process.env.FRONTEND_URL}/aura`;
+        // Redirect to frontend with tokens in URL parameters
+        const frontendUrl = `${process.env.FRONTEND_URL}/aura?access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}&expires_at=${expires_at}`;
         res.redirect(frontendUrl);
 
-        // Redirect back to the frontend, passing the token as a query parameter
-        // const frontendUrl = `${process.env.FRONTEND_URL}/?access_token=${access_token}&refresh_token=${refresh_token}&expires_at=${expires_at}`;
-        // res.redirect(frontendUrl);
     } catch (error) {
         console.error(error);
         res.status(500).send('Error exchanging code for token');
@@ -130,15 +93,17 @@ app.get('/api/auth/callback', async (req, res) => {
 });
 
 app.get('/api/profile', async (req, res) => {
-    // Ensure we have a valid token
-    const tokenError = await ensureValidToken(req, res);
-    if (tokenError) return; // Response already sent
+    // Get access token from Authorization header
+    const accessToken = getTokenFromHeader(req);
+    if (!accessToken) {
+        return res.status(401).json({ error: 'No authentication token provided. Please include Authorization header.' });
+    }
 
     // Make call to Strava API
     try {
         const profileResponse = await axios.get('https://www.strava.com/api/v3/athlete', {
             headers: {
-                Authorization: `Bearer ${req.session.access_token}`
+                Authorization: `Bearer ${accessToken}`
             }
         });
 
@@ -149,7 +114,7 @@ app.get('/api/profile', async (req, res) => {
         console.error('Error fetching athlete profile:', err.response?.data || err.message);
         
         if (err.response?.status === 401) {
-            res.status(401).json({ error: 'Authentication failed. Please re-authenticate.' });
+            res.status(401).json({ error: 'Authentication failed. Token may be expired.' });
         } else {
             res.status(500).json({ error: 'Error fetching athlete profile' });
         }
@@ -165,15 +130,17 @@ app.get('/api/stats/:profileId', async (req, res) => {
         return res.status(400).json({ error: 'Invalid profile ID provided' });
     }
 
-    // Ensure we have a valid token
-    const tokenError = await ensureValidToken(req, res);
-    if (tokenError) return; // Response already sent
+    // Get access token from Authorization header
+    const accessToken = getTokenFromHeader(req);
+    if (!accessToken) {
+        return res.status(401).json({ error: 'No authentication token provided. Please include Authorization header.' });
+    }
 
     // Make call to Strava API
     try {
         const statsResponse = await axios.get(`https://www.strava.com/api/v3/athletes/${profileId}/stats`, {
             headers: {
-                Authorization: `Bearer ${req.session.access_token}`
+                Authorization: `Bearer ${accessToken}`
             }
         });
 
@@ -184,7 +151,7 @@ app.get('/api/stats/:profileId', async (req, res) => {
         console.error('Error fetching athlete stats:', err.response?.data || err.message);
         
         if (err.response?.status === 401) {
-            res.status(401).json({ error: 'Authentication failed. Please re-authenticate.' });
+            res.status(401).json({ error: 'Authentication failed. Token may be expired.' });
         } else if (err.response?.status === 404) {
             res.status(404).json({ error: 'Athlete not found' });
         } else {
@@ -249,22 +216,41 @@ app.get('/api/proxy/image', async (req, res) => {
     }
 });
 
+// Token refresh endpoint
+app.post('/api/auth/refresh', async (req, res) => {
+    const { refresh_token } = req.body;
+    
+    if (!refresh_token) {
+        return res.status(400).json({ error: 'Refresh token is required' });
+    }
+
+    try {
+        const tokens = await refreshAccessToken(refresh_token);
+        res.json(tokens);
+    } catch (error) {
+        console.error('Error refreshing tokens:', error.message);
+        res.status(401).json({ error: 'Failed to refresh access token. Please re-authenticate.' });
+    }
+});
+
 // SEO/Open Graph metadata endpoint
 app.get('/api/seo/:athleteId', async (req, res) => {
     try {
         const { athleteId } = req.params;
         
-        if (!req.session.access_token) {
-            return res.status(401).json({ error: 'Authentication required' });
+        // Get access token from Authorization header
+        const accessToken = getTokenFromHeader(req);
+        if (!accessToken) {
+            return res.status(401).json({ error: 'No authentication token provided. Please include Authorization header.' });
         }
         
         // Get athlete profile and stats
         const profileResponse = await axios.get('https://www.strava.com/api/v3/athlete', {
-            headers: { 'Authorization': `Bearer ${req.session.access_token}` }
+            headers: { 'Authorization': `Bearer ${accessToken}` }
         });
         
         const statsResponse = await axios.get(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
-            headers: { 'Authorization': `Bearer ${req.session.access_token}` }
+            headers: { 'Authorization': `Bearer ${accessToken}` }
         });
         
         const profile = new AthleteProfile(profileResponse.data);
