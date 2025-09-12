@@ -1,0 +1,9 @@
+TODO
+
+Completed TODOs
+
+Note:
+- to develop locally, you must go to https://www.strava.com/settings/api and click edit
+- then set the authorization callback domain to localhost
+- when done developing, switch back to production domain:
+strava-aura.onrender.com
