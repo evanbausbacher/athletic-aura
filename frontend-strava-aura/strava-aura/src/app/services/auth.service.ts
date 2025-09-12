@@ -7,20 +7,21 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class AuthService {
-  apiUrl = '/api';
-  backendUrl = environment.apiUrl;
-
   private http = inject(HttpClient);
 
   getHello() {
-    return this.http.get(this.apiUrl + '/hello');
+    return this.http.get(`${environment.apiUrl}/api/hello`, {
+      withCredentials: true
+    });
   }
 
   redirectToStravaAuth() {
-    window.location.href = `${this.backendUrl}/auth/strava`;
+    window.location.href = `${environment.apiUrl}/auth/strava`;
   }
 
   getAccessToken(code: string): Observable<unknown> {
-    return this.http.get(`${this.apiUrl}/auth/callback?code=${code}`);
+    return this.http.get(`${environment.apiUrl}/api/auth/callback?code=${code}`, {
+      withCredentials: true
+    });
   }
 }

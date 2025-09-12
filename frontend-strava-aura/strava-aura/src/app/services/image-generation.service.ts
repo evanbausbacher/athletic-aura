@@ -126,6 +126,7 @@ export class ImageGenerationService {
       // Use proxy endpoint to bypass CORS
       const proxyUrl = `${environment.apiUrl}/api/proxy/image?url=${encodeURIComponent(profileImageUrl)}`;
       const img = new Image();
+      img.crossOrigin = 'use-credentials';
       
       img.onload = () => {
         console.log('Profile image loaded successfully via proxy');

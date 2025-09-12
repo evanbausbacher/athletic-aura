@@ -12,10 +12,14 @@ export class ProfileService {
   private http = inject(HttpClient);
 
   getProfile(): Observable<IAthleteProfile> {
-    return this.http.get<IAthleteProfile>(`${environment.apiUrl}/api/profile`);
+    return this.http.get<IAthleteProfile>(`${environment.apiUrl}/api/profile`, {
+      withCredentials: true
+    });
   }
 
   getStats(profileId: number): Observable<IAthleteStats> {
-    return this.http.get<IAthleteStats>(`${environment.apiUrl}/api/stats/${profileId}`);
+    return this.http.get<IAthleteStats>(`${environment.apiUrl}/api/stats/${profileId}`, {
+      withCredentials: true
+    });
   }
 }
