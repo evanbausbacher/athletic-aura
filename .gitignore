@@ -140,3 +140,4 @@ dist
 /.claude
 CLAUDE.md
 task.polish.md
+task.deploy.md

@@ -9,9 +9,12 @@ const AthleteStats = require('./models/AthleteStats');
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.use(cors()); 
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+    credentials: true
+})); 
 app.use(express.json());
 
 // Set up Session
@@ -19,7 +22,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'fallback-dev-secret-not-for-production',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure : false } // TODO: Set to true in production
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 
 // Helper function to refresh access token
