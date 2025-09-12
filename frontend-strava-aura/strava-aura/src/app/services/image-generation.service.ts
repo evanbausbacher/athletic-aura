@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 export interface ShareableImageData {
   overallScore: number;
@@ -123,7 +124,7 @@ export class ImageGenerationService {
       }
 
       // Use proxy endpoint to bypass CORS
-      const proxyUrl = `/api/proxy/image?url=${encodeURIComponent(profileImageUrl)}`;
+      const proxyUrl = `${environment.apiUrl}/api/proxy/image?url=${encodeURIComponent(profileImageUrl)}`;
       const img = new Image();
       
       img.onload = () => {
