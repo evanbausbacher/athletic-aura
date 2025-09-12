@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ProfileService } from '../services/profile.service';
 import { IAthleteProfile } from '../models/athlete-profile.model';
 import { IAthleteStats } from '../models/athlete-stats.model';
 import { IScore } from '../models/score.model';
 import { CalculateAuraService } from '../services/calculate-aura.service';
 import { ImageGenerationService, ShareableImageData } from '../services/image-generation.service';
+import { SeoService } from '../services/seo.service';
 import { fadeInAnimation, staggerAnimation, cardHoverAnimation, scoreRevealAnimation } from '../shared/animations';
 
 @Component({
@@ -13,7 +14,7 @@ import { fadeInAnimation, staggerAnimation, cardHoverAnimation, scoreRevealAnima
   styleUrl: './home.component.css',
   animations: [fadeInAnimation, staggerAnimation, cardHoverAnimation, scoreRevealAnimation]
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   athleteProfile: IAthleteProfile | null = null;
   athleteStats: IAthleteStats | null = null;
   auraScore: IScore | null = null;
@@ -25,9 +26,16 @@ export class HomeComponent implements OnInit {
   private profileService = inject(ProfileService);
   private scoreService = inject(CalculateAuraService);
   private imageService = inject(ImageGenerationService);
+  private seoService = inject(SeoService);
 
   ngOnInit(): void {
     this.loadAthleteData();
+  }
+
+  ngOnDestroy(): void {
+    // Clean up user-specific SEO data and structured data when leaving the component
+    this.seoService.resetToDefault();
+    this.seoService.removeStructuredDataScript();
   }
 
   private loadAthleteData(): void {
@@ -49,6 +57,13 @@ export class HomeComponent implements OnInit {
 
             // Cache improvement tips once score is calculated
             this.generateImprovementTips();
+            
+            // Update SEO with user-specific data
+            this.seoService.updateForUserScore(this.athleteProfile!, this.auraScore);
+            
+            // Add structured data for the user profile
+            const structuredData = this.seoService.generateStructuredData(this.athleteProfile!, this.auraScore);
+            this.seoService.addStructuredDataScript(structuredData);
 
             console.log(stats);
             console.log(this.auraScore);

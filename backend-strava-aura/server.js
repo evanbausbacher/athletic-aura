@@ -241,6 +241,97 @@ app.get('/api/proxy/image', async (req, res) => {
     }
 });
 
+// SEO/Open Graph metadata endpoint
+app.get('/api/seo/:athleteId', async (req, res) => {
+    try {
+        const { athleteId } = req.params;
+        
+        if (!req.session.access_token) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+        
+        // Get athlete profile and stats
+        const profileResponse = await axios.get('https://www.strava.com/api/v3/athlete', {
+            headers: { 'Authorization': `Bearer ${req.session.access_token}` }
+        });
+        
+        const statsResponse = await axios.get(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
+            headers: { 'Authorization': `Bearer ${req.session.access_token}` }
+        });
+        
+        const profile = new AthleteProfile(profileResponse.data);
+        const stats = new AthleteStats(statsResponse.data);
+        
+        // Calculate basic scores for SEO (simplified version)
+        const profileScore = calculateProfileScore(profile);
+        const overallScore = Math.round((profileScore + 50) / 2); // Simplified calculation
+        const grade = getGrade(overallScore);
+        const rating = getRating(overallScore);
+        
+        // Generate SEO data
+        const seoData = {
+            title: `${profile.firstname} ${profile.lastname}'s Strava Aura: ${overallScore} (${grade}) - ${rating}`,
+            description: `${profile.firstname} ${profile.lastname} achieved a Strava Aura score of ${overallScore} with grade ${grade}. Discover your own athletic aura with comprehensive cycling, running, and performance analytics.`,
+            image: profile.profile_medium || profile.profile || '/og-image-strava.png',
+            url: `/aura`,
+            athleteName: `${profile.firstname} ${profile.lastname}`,
+            score: overallScore,
+            grade: grade,
+            rating: rating,
+            location: profile.city ? `${profile.city}, ${profile.state || profile.country}` : null,
+            premium: profile.summit || false
+        };
+        
+        res.json(seoData);
+        
+    } catch (error) {
+        console.error('Error generating SEO data:', error.message);
+        res.status(500).json({ error: 'Failed to generate SEO data' });
+    }
+});
+
+// Helper functions for SEO endpoint
+function calculateProfileScore(profile) {
+    let score = 0;
+    if (profile.summit) score += 10;
+    if (profile.profile_medium) score += 10;
+    if (profile.bio) score += 10;
+    if (profile.city) score += 10;
+    if (profile.id < 1000000) score += 40;
+    else if (profile.id < 5000000) score += 30;
+    return Math.min(score, 100);
+}
+
+function getGrade(score) {
+    if (score >= 90) return 'A+';
+    if (score >= 85) return 'A';
+    if (score >= 80) return 'A-';
+    if (score >= 75) return 'B+';
+    if (score >= 70) return 'B';
+    if (score >= 65) return 'B-';
+    if (score >= 60) return 'C+';
+    if (score >= 55) return 'C';
+    if (score >= 50) return 'C-';
+    if (score >= 45) return 'D+';
+    if (score >= 40) return 'D';
+    return 'F';
+}
+
+function getRating(score) {
+    if (score >= 95) return 'Absolute Legend';
+    if (score >= 90) return 'Elite Athlete';
+    if (score >= 85) return 'Strava Superstar';
+    if (score >= 80) return 'Epic Endurist';
+    if (score >= 75) return 'Solid Performer';
+    if (score >= 70) return 'Active Enthusiast';
+    if (score >= 65) return 'Weekend Warrior';
+    if (score >= 60) return 'Getting There';
+    if (score >= 55) return 'Casual Movement Fan';
+    if (score >= 50) return 'Beginner Plus';
+    if (score >= 40) return 'Just Starting';
+    return 'Couch Potato';
+}
+
 app.listen(port, () => {
     console.log('Server listening on port ', port);
 });

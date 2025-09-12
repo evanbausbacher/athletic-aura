@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+
+# Main pages
+Allow: /
+Allow: /aura
+
+# Assets
+Allow: /assets/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.webp
+Allow: /*.svg
+Allow: /*.ico
+
+# Block sensitive areas (if any in future)
+# Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://strava-aura.app/sitemap.xml
+
+# Crawl delay (optional - remove if not needed)
+# Crawl-delay: 1

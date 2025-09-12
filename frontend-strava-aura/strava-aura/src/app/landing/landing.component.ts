@@ -1,18 +1,25 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SeoService } from '../services/seo.service';
 
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css',
 })
-export class LandingComponent {
+export class LandingComponent implements OnInit {
   hasToken = false;
 
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private seoService = inject(SeoService);
+
+  ngOnInit(): void {
+    // Ensure default SEO is set for the landing page
+    this.seoService.resetToDefault();
+  }
 
   // Trigger Strava OAuth2 authentication
   authenticateWithStrava() {
