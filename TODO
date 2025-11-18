@@ -1,9 +1,11 @@
 TODO
 
-[] auth system needs to be better and work in production
-[] get working in production and test on other devices / users
+[] submit for more connected user capacity
 
 Completed TODOs
+[x] auth system needs to be better and work in production
+[x] get working in production and test on other devices / users
+[x] refactor app to adhere to strava brand guidelines
 
 Note:
 - to develop locally, you must go to https://www.strava.com/settings/api and click edit

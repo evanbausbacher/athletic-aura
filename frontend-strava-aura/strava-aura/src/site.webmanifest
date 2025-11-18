@@ -5,7 +5,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a1a",
-  "theme_color": "#FC4C02",
+  "theme_color": "#FC5200",
   "orientation": "portrait-primary",
   "categories": ["health", "fitness", "sports", "analytics"],
   "lang": "en",

@@ -7,7 +7,7 @@ module.exports = {
     extend: {
       colors: {
         'strava': {
-          orange: '#FC4C02',
+          orange: '#FC5200',
           dark: '#1a1a1a',
           gray: '#2d2d2d',
         },
