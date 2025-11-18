@@ -51,7 +51,7 @@ export class ImageGenerationService {
     // Draw background
     await this.drawBackground();
 
-    // Draw Strava Aura logo
+    // Draw Athletic Aura logo
     await this.drawLogo();
 
     // Draw user profile image
@@ -345,7 +345,7 @@ export class ImageGenerationService {
     this.ctx.fillStyle = this.COLORS.text;
     this.ctx.font = 'bold 36px Lobster';
     this.ctx.textAlign = 'center';
-    this.ctx.fillText('Strava Aura', this.WIDTH / 2, y);
+    this.ctx.fillText('Athletic Aura', this.WIDTH / 2, y);
 
     // Tagline
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';

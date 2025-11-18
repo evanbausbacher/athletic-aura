@@ -1,10 +1,10 @@
-# 🔥 Strava Aura
+# 🔥 Athletic Aura
 
 A full-stack web application that analyzes your Strava data and generates a gamified "aura score" - because your athletic achievements deserve more than just kudos.
 
 ## What's Your Athletic Aura?
 
-Strava Aura evaluates athletes across five key categories, transforming raw data into meaningful insights with a healthy dose of personality:
+Athletic Aura evaluates athletes across five key categories, transforming raw data into meaningful insights with a healthy dose of personality:
 
 🏆 **Profile Completeness** - Are you a premium legend or still rocking that default avatar?  
 🚴 **Cycling Score** - From weekend warrior to Tour de France wannabe  

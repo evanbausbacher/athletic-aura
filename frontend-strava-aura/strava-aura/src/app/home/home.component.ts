@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   isLoading = true;
   errorMessage = '';
   showImprovementTips = false;
-  improvementTips: {category: string, tips: string[], currentScore: number}[] = [];
+  improvementTips: { category: string, tips: string[], currentScore: number }[] = [];
 
   private profileService = inject(ProfileService);
   private scoreService = inject(CalculateAuraService);
@@ -73,10 +73,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
             // Cache improvement tips once score is calculated
             this.generateImprovementTips();
-            
+
             // Update SEO with user-specific data
             this.seoService.updateForUserScore(this.athleteProfile!, this.auraScore);
-            
+
             // Add structured data for the user profile
             const structuredData = this.seoService.generateStructuredData(this.athleteProfile!, this.auraScore);
             this.seoService.addStructuredDataScript(structuredData);
@@ -157,9 +157,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     return 'text-red-400';
   }
 
-  getTopCategories(count = 3): {name: string; score: number; rating: string; emoji: string}[] {
+  getTopCategories(count = 3): { name: string; score: number; rating: string; emoji: string }[] {
     if (!this.auraScore?.scores) return [];
-    
+
     return this.auraScore.scores
       .map(score => ({
         name: score.categoryName,
@@ -173,14 +173,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   getRandomPerks(count = 3): string[] {
     if (!this.auraScore?.scores) return [];
-    
+
     const allPerks: string[] = [];
     this.auraScore.scores.forEach(score => {
       if (score.perks && score.perks.length > 0) {
         allPerks.push(...score.perks);
       }
     });
-    
+
     // Shuffle array and return random perks
     const shuffled = allPerks.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
@@ -317,10 +317,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     try {
       const imageDataUrl = await this.imageService.generateShareImage(shareData);
-      
+
       const sharePayload = {
-        title: 'My Strava Aura Score',
-        text: `Check out my Strava Aura score: ${this.auraScore.overallScore} (${this.auraScore.overallGrade})! 🏆`,
+        title: 'My Athletic Aura Score',
+        text: `Check out my Athletic Aura score: ${this.auraScore.overallScore} (${this.auraScore.overallGrade})! 🏆`,
         url: window.location.origin
       };
 

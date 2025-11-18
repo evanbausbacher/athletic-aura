@@ -1,13 +1,18 @@
 {
-  "name": "Strava Aura - Athletic Performance Analytics",
-  "short_name": "Strava Aura",
-  "description": "Discover your comprehensive Strava Aura score analyzing cycling, running, profile completeness, and epic achievements",
+  "name": "Athletic Aura - Athletic Performance Analytics",
+  "short_name": "Athletic Aura",
+  "description": "Discover your comprehensive Athletic Aura score analyzing cycling, running, profile completeness, and epic achievements",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a1a",
   "theme_color": "#FC5200",
   "orientation": "portrait-primary",
-  "categories": ["health", "fitness", "sports", "analytics"],
+  "categories": [
+    "health",
+    "fitness",
+    "sports",
+    "analytics"
+  ],
   "lang": "en",
   "dir": "ltr",
   "icons": [
@@ -42,7 +47,7 @@
       "src": "/og-image-strava.png",
       "sizes": "1200x630",
       "type": "image/png",
-      "label": "Strava Aura Dashboard"
+      "label": "Athletic Aura Dashboard"
     }
   ]
 }

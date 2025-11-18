@@ -8,7 +8,7 @@ import { IScoreCategory } from '../models/score-category.model';
   providedIn: 'root',
 })
 export class CalculateAuraService {
-  // Strava Aura - an overall score evaluating an Athlete on Strava, based on 4 categories:
+  // Athletic Aura - an overall score evaluating an Athlete on Strava, based on 4 categories:
   // 1. Profile Completeness : Has Bio / Has Profile Photo / Has City / Account Age
   // 2. Cycling Score : Recent activity, distance, elevation, total hours
   // 3. Running Score : Recent runs, distance, elevation, total hours  
@@ -50,7 +50,7 @@ export class CalculateAuraService {
     if (!this.profileScore || !this.rideScore || !this.runScore || !this.epicScore) {
       return 0;
     }
-    
+
     // Calculate weighted average (cycling and running weighted more heavily)
     const totalScore = (
       this.profileScore.score * 1.0 +
@@ -58,14 +58,14 @@ export class CalculateAuraService {
       this.runScore.score * 1.5 +
       this.epicScore.score * 1.2
     );
-    
+
     const totalWeight = 4 // 1.0 + 1.5 + 1.5 + 1.2; // = 5.2
     return Math.round(totalScore / totalWeight);
   }
 
   private calculateOverallGrade(): string {
     const score = this.calculateOverallScore();
-    
+
     if (score >= 90) return 'A+';
     if (score >= 85) return 'A';
     if (score >= 80) return 'A-';
@@ -82,7 +82,7 @@ export class CalculateAuraService {
 
   private calculateOverallRating(): string {
     const score = this.calculateOverallScore();
-    
+
     if (score >= 95) return 'Absolute Legend';
     if (score >= 90) return 'Elite Athlete';
     if (score >= 85) return 'Strava Superstar';
@@ -111,7 +111,7 @@ export class CalculateAuraService {
     if (profile.profile_medium) {
       score += 10;
     }
-    else{
+    else {
       perks[index] = 'too lazy to upload photo';
       index++;
     }

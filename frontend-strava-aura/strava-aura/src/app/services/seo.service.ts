@@ -18,10 +18,10 @@ export interface SEOData {
 export class SeoService {
   private titleService = inject(Title);
   private metaService = inject(Meta);
-  
+
   private readonly defaultSEO: SEOData = {
-    title: 'Strava Aura - Your Athletic Aura Score | Gamified Fitness Analytics',
-    description: 'Discover your Strava Aura score - a comprehensive gamified rating system analyzing your cycling, running, profile completeness, and epic achievements. Connect with Strava to get your personalized athletic aura rating.',
+    title: 'Athletic Aura - Your Athletic Aura Score | Gamified Fitness Analytics',
+    description: 'Discover your Athletic Aura score - a comprehensive gamified rating system analyzing your cycling, running, profile completeness, and epic achievements. Connect with Strava to get your personalized athletic aura rating.',
     keywords: 'Strava, aura score, cycling analytics, running stats, fitness tracking, athletic performance, Strava analysis, sports data visualization, gamified fitness',
     image: 'https://strava-aura.app/og-image-strava.png',
     url: 'https://strava-aura.app',
@@ -30,28 +30,28 @@ export class SeoService {
 
   updateSEO(data: Partial<SEOData>): void {
     const seoData = { ...this.defaultSEO, ...data };
-    
+
     // Update title
     if (seoData.title) {
       this.titleService.setTitle(seoData.title);
     }
-    
+
     // Update meta tags
     this.updateMetaTag('description', seoData.description);
     this.updateMetaTag('keywords', seoData.keywords);
-    
+
     // Update Open Graph tags
     this.updateMetaProperty('og:title', seoData.title);
     this.updateMetaProperty('og:description', seoData.description);
     this.updateMetaProperty('og:image', seoData.image);
     this.updateMetaProperty('og:url', seoData.url);
     this.updateMetaProperty('og:type', seoData.type);
-    
+
     // Update Twitter Card tags
     this.updateMetaTag('twitter:title', seoData.title);
     this.updateMetaTag('twitter:description', seoData.description);
     this.updateMetaTag('twitter:image', seoData.image);
-    
+
     // Update canonical URL
     this.updateCanonicalUrl(seoData.url || this.defaultSEO.url!);
   }
@@ -61,15 +61,15 @@ export class SeoService {
     const score = auraScore.overallScore;
     const grade = auraScore.overallGrade;
     const rating = auraScore.overallRating;
-    
+
     const customSEO: SEOData = {
-      title: `${userName}'s Strava Aura: ${score} (${grade}) - ${rating} | Athletic Performance Analytics`,
-      description: `${userName} achieved a Strava Aura score of ${score} with grade ${grade} - ${rating}. Analyze cycling, running, profile completeness, and epic achievements with personalized improvement tips.`,
-      keywords: `${userName}, Strava aura, ${score} score, ${grade} grade, ${rating}, cycling analytics, running stats, athletic performance`,
+      title: `${userName}'s Athletic Aura: ${score} (${grade}) - ${rating} | Athletic Performance Analytics`,
+      description: `${userName} achieved a Athletic Aura score of ${score} with grade ${grade} - ${rating}. Analyze cycling, running, profile completeness, and epic achievements with personalized improvement tips.`,
+      keywords: `${userName}, Athletic Aura, ${score} score, ${grade} grade, ${rating}, cycling analytics, running stats, athletic performance`,
       url: 'https://strava-aura.app/aura',
       type: 'profile'
     };
-    
+
     this.updateSEO(customSEO);
   }
 
@@ -84,7 +84,7 @@ export class SeoService {
       "name": `${athleteProfile.firstname} ${athleteProfile.lastname}`,
       "url": `https://strava-aura.app/aura`,
       "image": athleteProfile.profile_medium || athleteProfile.profile,
-      "description": `Athletic performance profile with Strava Aura score of ${auraScore.overallScore}`,
+      "description": `Athletic performance profile with Athletic Aura score of ${auraScore.overallScore}`,
       "knowsAbout": [
         "Cycling",
         "Running",
@@ -101,18 +101,18 @@ export class SeoService {
         "url": "https://www.strava.com"
       },
       "award": [
-        `Strava Aura Score: ${auraScore.overallScore}`,
+        `Athletic Aura Score: ${auraScore.overallScore}`,
         `Athletic Grade: ${auraScore.overallGrade}`,
         `Performance Rating: ${auraScore.overallRating}`
       ]
     };
-    
+
     return JSON.stringify(structuredData);
   }
 
   private updateMetaTag(name: string, content?: string): void {
     if (!content) return;
-    
+
     if (this.metaService.getTag(`name="${name}"`)) {
       this.metaService.updateTag({ name, content });
     } else {
@@ -122,7 +122,7 @@ export class SeoService {
 
   private updateMetaProperty(property: string, content?: string): void {
     if (!content) return;
-    
+
     if (this.metaService.getTag(`property="${property}"`)) {
       this.metaService.updateTag({ property, content });
     } else {
@@ -148,7 +148,7 @@ export class SeoService {
     if (existingScript) {
       existingScript.remove();
     }
-    
+
     // Add new structured data script
     const script = document.createElement('script');
     script.type = 'application/ld+json';

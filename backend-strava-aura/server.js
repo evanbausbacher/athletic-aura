@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:4200',
     credentials: true
-})); 
+}));
 app.use(express.json());
 
 // Session middleware removed - using token-based authentication instead
@@ -30,7 +30,7 @@ async function refreshAccessToken(refreshToken) {
         });
 
         const { access_token, refresh_token, expires_at } = response.data;
-        
+
         console.log('Access token refreshed successfully');
         return { access_token, refresh_token, expires_at };
     } catch (error) {
@@ -112,7 +112,7 @@ app.get('/api/profile', async (req, res) => {
 
     } catch (err) {
         console.error('Error fetching athlete profile:', err.response?.data || err.message);
-        
+
         if (err.response?.status === 401) {
             res.status(401).json({ error: 'Authentication failed. Token may be expired.' });
         } else {
@@ -149,7 +149,7 @@ app.get('/api/stats/:profileId', async (req, res) => {
 
     } catch (err) {
         console.error('Error fetching athlete stats:', err.response?.data || err.message);
-        
+
         if (err.response?.status === 401) {
             res.status(401).json({ error: 'Authentication failed. Token may be expired.' });
         } else if (err.response?.status === 404) {
@@ -163,12 +163,12 @@ app.get('/api/stats/:profileId', async (req, res) => {
 // Image proxy endpoint to bypass CORS for profile images
 app.get('/api/proxy/image', async (req, res) => {
     const { url } = req.query;
-    
+
     // Validate URL parameter
     if (!url) {
         return res.status(400).json({ error: 'URL parameter is required' });
     }
-    
+
     // Security: Only allow Strava CDN URLs
     const allowedDomains = [
         'dgalywyr863hv.cloudfront.net',
@@ -176,13 +176,13 @@ app.get('/api/proxy/image', async (req, res) => {
         'lh3.googleusercontent.com',
         'd3nn82uaxijpm6.cloudfront.net'
     ];
-    
+
     try {
         const urlObj = new URL(url);
         if (!allowedDomains.includes(urlObj.hostname)) {
             return res.status(403).json({ error: 'Domain not allowed' });
         }
-        
+
         // Fetch the image
         const imageResponse = await axios.get(url, {
             responseType: 'arraybuffer',
@@ -191,7 +191,7 @@ app.get('/api/proxy/image', async (req, res) => {
                 'User-Agent': 'Strava-Aura/1.0'
             }
         });
-        
+
         // Set appropriate headers
         const contentType = imageResponse.headers['content-type'] || 'image/jpeg';
         res.set({
@@ -199,13 +199,13 @@ app.get('/api/proxy/image', async (req, res) => {
             'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'http://localhost:4200',
             'Cache-Control': 'public, max-age=3600' // Cache for 1 hour
         });
-        
+
         // Send the image data
         res.send(imageResponse.data);
-        
+
     } catch (error) {
         console.error('Error proxying image:', error.message);
-        
+
         if (error.code === 'ETIMEDOUT') {
             res.status(408).json({ error: 'Request timeout' });
         } else if (error.response?.status) {
@@ -219,7 +219,7 @@ app.get('/api/proxy/image', async (req, res) => {
 // Token refresh endpoint
 app.post('/api/auth/refresh', async (req, res) => {
     const { refresh_token } = req.body;
-    
+
     if (!refresh_token) {
         return res.status(400).json({ error: 'Refresh token is required' });
     }
@@ -237,35 +237,35 @@ app.post('/api/auth/refresh', async (req, res) => {
 app.get('/api/seo/:athleteId', async (req, res) => {
     try {
         const { athleteId } = req.params;
-        
+
         // Get access token from Authorization header
         const accessToken = getTokenFromHeader(req);
         if (!accessToken) {
             return res.status(401).json({ error: 'No authentication token provided. Please include Authorization header.' });
         }
-        
+
         // Get athlete profile and stats
         const profileResponse = await axios.get('https://www.strava.com/api/v3/athlete', {
             headers: { 'Authorization': `Bearer ${accessToken}` }
         });
-        
+
         const statsResponse = await axios.get(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
             headers: { 'Authorization': `Bearer ${accessToken}` }
         });
-        
+
         const profile = new AthleteProfile(profileResponse.data);
         const stats = new AthleteStats(statsResponse.data);
-        
+
         // Calculate basic scores for SEO (simplified version)
         const profileScore = calculateProfileScore(profile);
         const overallScore = Math.round((profileScore + 50) / 2); // Simplified calculation
         const grade = getGrade(overallScore);
         const rating = getRating(overallScore);
-        
+
         // Generate SEO data
         const seoData = {
-            title: `${profile.firstname} ${profile.lastname}'s Strava Aura: ${overallScore} (${grade}) - ${rating}`,
-            description: `${profile.firstname} ${profile.lastname} achieved a Strava Aura score of ${overallScore} with grade ${grade}. Discover your own athletic aura with comprehensive cycling, running, and performance analytics.`,
+            title: `${profile.firstname} ${profile.lastname}'s Athletic Aura: ${overallScore} (${grade}) - ${rating}`,
+            description: `${profile.firstname} ${profile.lastname} achieved a Athletic Aura score of ${overallScore} with grade ${grade}. Discover your own athletic aura with comprehensive cycling, running, and performance analytics.`,
             image: profile.profile_medium || profile.profile || '/og-image-strava.png',
             url: `/aura`,
             athleteName: `${profile.firstname} ${profile.lastname}`,
@@ -275,9 +275,9 @@ app.get('/api/seo/:athleteId', async (req, res) => {
             location: profile.city ? `${profile.city}, ${profile.state || profile.country}` : null,
             premium: profile.summit || false
         };
-        
+
         res.json(seoData);
-        
+
     } catch (error) {
         console.error('Error generating SEO data:', error.message);
         res.status(500).json({ error: 'Failed to generate SEO data' });
